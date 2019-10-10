@@ -60,8 +60,12 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define SP1_SS_Pin GPIO_PIN_0
 #define SP1_SS_GPIO_Port GPIOB
-#define ADXLInt_Pin GPIO_PIN_1
-#define ADXLInt_GPIO_Port GPIOB
+#define ADXL_INT1_Pin GPIO_PIN_1
+#define ADXL_INT1_GPIO_Port GPIOB
+#define ADXL_INT1_EXTI_IRQn EXTI1_IRQn
+#define ADXL_INT2_Pin GPIO_PIN_7
+#define ADXL_INT2_GPIO_Port GPIOB
+#define ADXL_INT2_EXTI_IRQn EXTI9_5_IRQn
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
