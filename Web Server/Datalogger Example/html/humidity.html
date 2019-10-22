@@ -1,0 +1,130 @@
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<META http-equiv="refresh" content="300">
+<script type="text/javascript" src="moment-with-locales.js"></script>
+<script type="text/javascript" src="Chart.min.js"></script>
+<script type="text/javascript" src="jquery.min.js"></script>
+<style>
+#myChart {
+	background-color: #000000;
+}
+</style>
+<title>Humidity Chart</title>
+</head>
+<body bgcolor="black">
+	
+<canvas id="humidityChart" width="1300" height="900"></canvas>
+
+<script>
+function plot(out) {
+var humiditysum=0;
+var len=30;
+
+if (out["humidity"].length<30) {
+    len=out["humidity"].length;
+}
+
+for (var j=0;j<len;j++) {
+    humiditysum=humiditysum+(out["humidity"][j].y)/1000;
+}
+
+for (var i=0; i<out["humidity"].length-30; i++) {
+    var currenthumidity=(out["humidity"][i].y)/1000;
+    
+    out["humidity"][i].y=humiditysum/30;
+    
+    humiditysum=humiditysum-currenthumidity+(out["humidity"][i+len].y)/1000;  
+}
+
+for (var i=out["humidity"].length-30; i<out["humidity"].length; i++) {
+    var currenthumidity=(out["humidity"][i].y)/1000;
+    
+    var len=out["humidity"].length-i;
+    
+    out["humidity"][i].y=humiditysum/len;
+    
+    humiditysum=humiditysum-currenthumidity;
+}
+
+var ctx = document.getElementById("humidityChart").getContext('2d');
+Chart.defaults.global.defaultFontSize = 16;
+Chart.defaults.global.defaultFontColor = "#FFFFFF";
+var myChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        datasets: [{
+			label: "HUMIDITY",
+			lineTension: 0,
+			pointRadius: 0,
+			borderColor: "magenta",
+			borderWidth: 2,
+			cubicInterpolationMode: "monotone",
+            data: out["humidity"],
+			fill: false
+        }],
+    },
+    options: {
+		responsive: false,
+		responsiveAnimationDuration:0,
+		animation: {
+			duration: 0,
+		},
+		hover: {
+			animationDuration: 400,
+		},
+        scales: {
+			xAxes: [{
+				type: "time",
+				display: true,
+				scaleLabel: {
+					display: true,
+					labelString: "Time",
+				},
+				gridLines: {
+					color: "rgba(255, 0, 0, 255)",
+					borderDash: [4, 8],
+				},
+			}],
+			yAxes: [{
+				display: true,
+				scaleLabel: {
+					display: true,
+					labelString: "Humidity [%]",
+				},
+				gridLines: {
+					zeroLineColor: "rgba(255, 0, 0, 255)",
+					zeroLineBorderDash: [4, 8],
+					color: "rgba(255, 0, 0, 255)",
+					borderDash: [4, 8],
+				},
+			}]
+		},
+		legend: {
+			display: false,
+			position: "top",
+			labels: {
+				boxWidth: 2,
+			},
+		},
+		title: {
+			display: true,
+			fontSize: 24,
+			text: "Humidity",
+		}
+    }
+});
+ctx.font = "14px Arial";
+ctx.fillStyle = "white";
+var d = new Date();
+ctx.fillText("Current Time: " + d.toLocaleString(),90,30); 
+ctx.fillText("Last Recorded Humidity: " + out["humidity"][out["humidity"].length-1].y.toFixed(1),130,65);
+ctx.beginPath();
+ctx.moveTo(110,60);
+ctx.lineTo(120,60);
+ctx.stroke();
+}
+var jsondata= $.ajax({url: 'sql24.php', dataType: 'json', }).done(function (out) { plot(out); } );
+</script>
+</body>
+</html>

@@ -94,10 +94,9 @@ DMA_HandleTypeDef hdma_usart2_tx;
 
 /* USER CODE BEGIN PV */
 
-uint8_t x8 = 0, y8 = 0, z8 = 0;
+int8_t x8 = 0, y8 = 0, z8 = 0;
 int16_t x12 = 0, y12 = 0, z12 = 0;
-uint32_t drFlag, SPI2XxFlag;
-int16_t x,y,z;
+volatile uint32_t drFlag, SPI2XxFlag;
 float xg, yg, zg;
 char message[50];
 /* USER CODE END PV */
@@ -116,7 +115,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
 uint8_t ADXL362_ReadReg(uint8_t address);
 void ADXL362_WriteReg(uint8_t address, uint8_t cmd);
 void ADXL362_Init(void);
-void ADXL362_GetXYZ8(uint8_t *x, uint8_t *y, uint8_t *z);
+void ADXL362_GetXYZ8(int8_t *x, int8_t *y, int8_t *z);
 void ADXL362_GetXYZ12(int16_t *x, int16_t *y, int16_t *z);
 /* USER CODE END PFP */
 
@@ -200,6 +199,7 @@ int main(void)
 		  {
 			  ADXL362_GetXYZ8(&x8, &y8, &z8);
 			  sprintf(message, "%+04d %+04d %+04d\r\n", x8,y8,z8);
+			  HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), 0xFFFF);
 			  drFlag = 0;
 		  }
 
@@ -208,6 +208,7 @@ int main(void)
 			  ADXL362_GetXYZ12(&x12, &y12, &z12);
 			  sprintf(message, "%+05d %+05d %+05d\r\n", x12, y12, z12);
 			  //sprintf(message, "%04X, %04X, %04X\r\n", x12, y12, z12);
+			  HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), 0xFFFF);
 			  drFlag = 0;
 		  }
 	  }
@@ -455,6 +456,9 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 uint8_t ADXL362_ReadReg (uint8_t address)
 {
+	//HAL_NVIC_DisableIRQ(ADXL362_INT1_EXTI_IRQn);
+	//HAL_NVIC_DisableIRQ(ADXL362_INT2_EXTI_IRQn);
+
 	uint8_t rxBuf[3], txBuf[3];
 
 	txBuf[2] = 0x0;
@@ -464,7 +468,10 @@ uint8_t ADXL362_ReadReg (uint8_t address)
 	SPI2XxFlag = 0;
 	HAL_GPIO_WritePin(SPI2_CS_GPIO_Port, SPI2_CS_Pin, GPIO_PIN_RESET);	// Pull CS pin low to enable the slave
 	HAL_SPI_TransmitReceive_DMA(&hspi2, txBuf, rxBuf, 3);
+	while(HAL_SPI_GetState(&hspi2) != HAL_SPI_STATE_READY);
 	HAL_GPIO_WritePin(SPI2_CS_GPIO_Port, SPI2_CS_Pin, GPIO_PIN_SET);	// Pull CS pin high to disable the slave
+	//HAL_NVIC_EnableIRQ(ADXL362_INT1_EXTI_IRQn);
+	//HAL_NVIC_EnableIRQ(ADXL362_INT2_EXTI_IRQn);
 
 	return rxBuf[2];
 }
@@ -477,6 +484,9 @@ uint8_t ADXL362_ReadReg (uint8_t address)
   */
 void ADXL362_WriteReg (uint8_t address, uint8_t cmd)
 {
+	//HAL_NVIC_DisableIRQ(ADXL362_INT1_EXTI_IRQn);
+	//HAL_NVIC_DisableIRQ(ADXL362_INT2_EXTI_IRQn);
+
 	uint8_t txBuf[3], rxBuf[3];
 
 	txBuf[2] = cmd;			// Command
@@ -486,7 +496,11 @@ void ADXL362_WriteReg (uint8_t address, uint8_t cmd)
 	SPI2XxFlag = 0;
 	HAL_GPIO_WritePin(SPI2_CS_GPIO_Port, SPI2_CS_Pin, GPIO_PIN_RESET);	// Pull CS pin low to enable the slave
 	HAL_SPI_TransmitReceive_DMA(&hspi2, txBuf, rxBuf, 3); 						// Transmit the write instruction, address, and command
+	while(HAL_SPI_GetState(&hspi2) != HAL_SPI_STATE_READY);
 	HAL_GPIO_WritePin(SPI2_CS_GPIO_Port, SPI2_CS_Pin, GPIO_PIN_SET);	// Pull CS pin high to disable the slave
+
+	//HAL_NVIC_EnableIRQ(ADXL362_INT1_EXTI_IRQn);
+	//HAL_NVIC_EnableIRQ(ADXL362_INT2_EXTI_IRQn);
 }
 
 /**
@@ -510,9 +524,8 @@ void ADXL362_Init(void)
 	// Reset ADXL362 by writing 0x52(R in ASCII) to the Soft Reset Register
 	sprintf(msg, "Initiating ADXL362!\r\n");
 	HAL_UART_Transmit(&huart2, (uint8_t*)msg, strlen(msg), 0xFFFF);
-	HAL_Delay(10);
 	ADXL362_WriteReg(SOFT_RESET, 0x52);
-	HAL_Delay(50);
+	HAL_Delay(1);
 
 	// Read ADXL362 registers
 	reg = ADXL362_ReadReg(DEVID_AD); 	// Read ID Register
@@ -559,22 +572,28 @@ void ADXL362_Init(void)
   * @param z Points to Z-axis data buffer
   * @retval None
   */
-void ADXL362_GetXYZ8(uint8_t *x, uint8_t *y, uint8_t *z)
+void ADXL362_GetXYZ8(int8_t *x, int8_t *y, int8_t *z)
 {
+	//HAL_NVIC_DisableIRQ(ADXL362_INT1_EXTI_IRQn);
+	//HAL_NVIC_DisableIRQ(ADXL362_INT2_EXTI_IRQn);
 
-	uint8_t xyzVal[8] = {0,0,0,0,0,0,0,0};
-	uint8_t txBuf[8] = {0,0,0,0,0,0,0,0};
+	uint8_t xyzVal[5] = {0,0,0,0,0};
+	uint8_t txBuf[5] = {0,0,0,0,0};
 
-	txBuf[1] = XDATA_L;		// Address
+	txBuf[1] = XDATA;		// Address
 	txBuf[0] = RD_ADXL;		// Read instruction
 
+	SPI2XxFlag = 0;
 	HAL_GPIO_WritePin(SPI2_CS_GPIO_Port, SPI2_CS_Pin, GPIO_PIN_RESET);	// Pull CS pin low to enable the slave
-	HAL_SPI_TransmitReceive_DMA(&hspi2, txBuf, xyzVal, 8);
-	HAL_GPIO_WritePin(SPI2_CS_GPIO_Port, SPI2_CS_Pin, GPIO_PIN_SET);		// Pull CS pin high to disable the slave
+	HAL_SPI_TransmitReceive_DMA(&hspi2, txBuf, xyzVal, 5);
 
-	*x = ((uint16_t)xyzVal[3] << 8) + xyzVal[2];
-	*y = ((uint16_t)xyzVal[5] << 8) + xyzVal[4];
-	*z = ((uint16_t)xyzVal[7] << 8) + xyzVal[6];
+	//HAL_NVIC_EnableIRQ(ADXL362_INT1_EXTI_IRQn);
+	//HAL_NVIC_EnableIRQ(ADXL362_INT2_EXTI_IRQn);
+	while(HAL_SPI_GetState(&hspi2) != HAL_SPI_STATE_READY);
+	HAL_GPIO_WritePin(SPI2_CS_GPIO_Port, SPI2_CS_Pin, GPIO_PIN_SET);	// Pull CS pin high to disable the slave
+	*x = xyzVal[2];
+	*y = xyzVal[3];
+	*z = xyzVal[4];
 }
 
 /**
@@ -584,22 +603,23 @@ void ADXL362_GetXYZ8(uint8_t *x, uint8_t *y, uint8_t *z)
   * @param z Points to Z-axis data buffer
   * @retval None
   */
-void ADXL362_GetXYZ12(int16_t *x, int16_t *y, int16_t *z, int16_t *temp)
+void ADXL362_GetXYZ12(int16_t *x, int16_t *y, int16_t *z)
 {
-	uint8_t xyzVal[10] = {0,0,0,0,0,0,0,0,0,0};
-	uint8_t txBuf[10] = {0,0,0,0,0,0,0,0,0,0};
+	uint8_t xyzVal[8] = {0,0,0,0,0,0,0,0};
+	uint8_t txBuf[8] = {0,0,0,0,0,0,0,0};
 
 	txBuf[1] = XDATA_L;		// Address
 	txBuf[0] = RD_ADXL;		// Read instruction
 
+	SPI2XxFlag = 0;
 	HAL_GPIO_WritePin(SPI2_CS_GPIO_Port, SPI2_CS_Pin, GPIO_PIN_RESET);	// Pull CS pin low to enable the slave
-	HAL_SPI_TransmitReceive_DMA(&hspi2, txBuf, xyzVal, 10);
-	HAL_GPIO_WritePin(SPI2_CS_GPIO_Port, SPI2_CS_Pin, GPIO_PIN_SET);		// Pull CS pin high to disable the slave
+	HAL_SPI_TransmitReceive_DMA(&hspi2, txBuf, xyzVal, 8);
+	//HAL_GPIO_WritePin(SPI2_CS_GPIO_Port, SPI2_CS_Pin, GPIO_PIN_SET);		// Pull CS pin high to disable the slave
 
 	*x = ((uint16_t)xyzVal[3] << 8) + xyzVal[2];
 	*y = ((uint16_t)xyzVal[5] << 8) + xyzVal[4];
 	*z = ((uint16_t)xyzVal[7] << 8) + xyzVal[6];
-	*temp = ((uint16_t)xyzVal[9] << 8) + xyzVal[8];
+	//*temp = ((uint16_t)xyzVal[9] << 8) + xyzVal[8];
 }
 /* USER CODE END 4 */
 

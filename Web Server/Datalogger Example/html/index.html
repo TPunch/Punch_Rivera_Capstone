@@ -1,0 +1,32 @@
+<html>
+<head>
+	<title>ECE 331 Project 2</title>
+</head>
+
+<body>
+	<h1>Welcome to Kevin Rivera's webpage!</h1>
+	<p>This webpage was created by Kevin Rivera, 5/1/2019, for Sheaff's ECE 331 Project 2 [Spring 2019].</p>
+	
+	<h1>Procedure</h1>
+	<p>In order to complete this project, the following steps were taken:</p>
+	<p>1) Create a SQL database which will contain the sensor values from the RPiHat.</p>
+	<p>2) Create a perl script that will obtain the sensor values from the RPiHat and insert the sensor values and the date and time of the reading into the database.</p>
+	<p>3) Setup a crontab job which runs the perl script every minute.</p>
+	<p>4) Setup a web server (apache2) in order to use ChartJS to create charts for each sensor's values over time.</p>
+	<p>5) Create a php script to access the database and convert the recorded data into JSON format.</p>
+	<p>6) Create a javascript script in ChartJS that graphs the JSON formatted data for the last 24 hours worth of data.</p>
+	<p>7) Once the webpage(s) are displaying what is required, setup port forwarding on the network's router so the webpage(s) are accessible from the public internet.</p>
+	<p>8) Have fun staring at charts!</p>
+</body>
+<h1>SENSOR CHARTS</h1>
+<p>Click one of the buttons below to go to a sensor's chart!</p>
+<form method="get">
+	<button type="link" formaction="temp.html">Temperature</button>
+	<button type="link" formaction="ir.html">IR Intensity</button>
+	<button type="link" formaction="full.html">Full Spectrum Intensity</button>
+	<button type="link" formaction="vis.html">Visible Light</button>
+	<button type="link" formaction="lux.html">Illuminance</button>
+	<button type="link" formaction="pressure.html">Pressure</button>
+	<button type="link" formaction="humidity.html">Humidity</button>
+</form>
+</html>

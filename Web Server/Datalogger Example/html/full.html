@@ -1,0 +1,130 @@
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<META http-equiv="refresh" content="300">
+<script type="text/javascript" src="moment-with-locales.js"></script>
+<script type="text/javascript" src="Chart.min.js"></script>
+<script type="text/javascript" src="jquery.min.js"></script>
+<style>
+#myChart {
+	background-color: #000000;
+}
+</style>
+<title>Full Spectrum Intensity Chart</title>
+</head>
+<body bgcolor="black">
+	
+<canvas id="fullChart" width="1300" height="900"></canvas>
+
+<script>
+function plot(out) {
+var fullsum=0;
+var len=30;
+
+if (out["full"].length<30) {
+    len=out["full"].length;
+}
+
+for (var j=0;j<len;j++) {
+    fullsum=fullsum+out["full"][j].y;
+}
+
+for (var i=0; i<out["full"].length-30; i++) {
+    var currentfull=out["full"][i].y;
+    
+    out["full"][i].y=fullsum/30;
+    
+    fullsum=fullsum-currentfull+out["full"][i+len].y;  
+}
+
+for (var i=out["full"].length-30; i<out["full"].length; i++) {
+    var currentfull=out["full"][i].y;
+    
+    var len=out["full"].length-i;
+    
+    out["full"][i].y=fullsum/len;
+    
+    fullsum=fullsum-currentfull;
+}
+
+var ctx = document.getElementById("fullChart").getContext('2d');
+Chart.defaults.global.defaultFontSize = 16;
+Chart.defaults.global.defaultFontColor = "#FFFFFF";
+var myChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        datasets: [{
+			label: "FULL",
+			lineTension: 0,
+			pointRadius: 0,
+			borderColor: "green",
+			borderWidth: 2,
+			cubicInterpolationMode: "monotone",
+            data: out["full"],
+			fill: false
+        }],
+    },
+    options: {
+		responsive: false,
+		responsiveAnimationDuration:0,
+		animation: {
+			duration: 0,
+		},
+		hover: {
+			animationDuration: 400,
+		},
+        scales: {
+			xAxes: [{
+				type: "time",
+				display: true,
+				scaleLabel: {
+					display: true,
+					labelString: "Time",
+				},
+				gridLines: {
+					color: "rgba(255, 0, 0, 255)",
+					borderDash: [4, 8],
+				},
+			}],
+			yAxes: [{
+				display: true,
+				scaleLabel: {
+					display: true,
+					labelString: "Intensity",
+				},
+				gridLines: {
+					zeroLineColor: "rgba(255, 0, 0, 255)",
+					zeroLineBorderDash: [4, 8],
+					color: "rgba(255, 0, 0, 255)",
+					borderDash: [4, 8],
+				},
+			}]
+		},
+		legend: {
+			display: false,
+			position: "top",
+			labels: {
+				boxWidth: 2,
+			},
+		},
+		title: {
+			display: true,
+			fontSize: 24,
+			text: "Full Spectrum Intensity",
+		}
+    }
+});
+ctx.font = "14px Arial";
+ctx.fillStyle = "white";
+var d = new Date();
+ctx.fillText("Current Time: " + d.toLocaleString(),90,30); 
+ctx.fillText("Last Recorded Full Spectrum Intensity: " + out["full"][out["full"].length-1].y.toFixed(1),115,65);
+ctx.beginPath();
+ctx.moveTo(95,60);
+ctx.lineTo(105,60);
+ctx.stroke();
+}
+var jsondata= $.ajax({url: 'sql24.php', dataType: 'json', }).done(function (out) { plot(out); } );
+</script>
+</body>
+</html>

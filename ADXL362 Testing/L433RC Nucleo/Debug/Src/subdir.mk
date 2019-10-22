@@ -30,7 +30,7 @@ Src/%.o: ../Src/%.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: MCU GCC Compiler'
 	@echo $(PWD)
-	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 '-D__weak=__attribute__((weak))' '-D__packed=__attribute__((__packed__))' -DUSE_HAL_DRIVER -DSTM32L433xx -I"D:/Documents/GDWS/Cubedev/CAP/Inc" -I"D:/Documents/GDWS/Cubedev/CAP/Drivers/STM32L4xx_HAL_Driver/Inc" -I"D:/Documents/GDWS/Cubedev/CAP/Drivers/STM32L4xx_HAL_Driver/Inc/Legacy" -I"D:/Documents/GDWS/Cubedev/CAP/Drivers/CMSIS/Device/ST/STM32L4xx/Include" -I"D:/Documents/GDWS/Cubedev/CAP/Drivers/CMSIS/Include"  -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" -o "$@" "$<"
+	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 '-D__weak=__attribute__((weak))' '-D__packed=__attribute__((__packed__))' -DUSE_HAL_DRIVER -DSTM32L433xx -I"D:/ECE486_Labs/Cap/Punch_Rivera_Capstone/ADXL362 Testing/L433RC Nucleo/Inc" -I"D:/ECE486_Labs/Cap/Punch_Rivera_Capstone/ADXL362 Testing/L433RC Nucleo/Drivers/STM32L4xx_HAL_Driver/Inc" -I"D:/ECE486_Labs/Cap/Punch_Rivera_Capstone/ADXL362 Testing/L433RC Nucleo/Drivers/STM32L4xx_HAL_Driver/Inc/Legacy" -I"D:/ECE486_Labs/Cap/Punch_Rivera_Capstone/ADXL362 Testing/L433RC Nucleo/Drivers/CMSIS/Device/ST/STM32L4xx/Include" -I"D:/ECE486_Labs/Cap/Punch_Rivera_Capstone/ADXL362 Testing/L433RC Nucleo/Drivers/CMSIS/Include"  -Og -g3 -Wall -fmessage-length=0 -ffunction-sections -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

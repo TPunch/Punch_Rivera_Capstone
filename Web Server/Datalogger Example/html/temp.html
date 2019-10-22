@@ -1,0 +1,158 @@
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<META http-equiv="refresh" content="300">
+<script type="text/javascript" src="moment-with-locales.js"></script>
+<script type="text/javascript" src="Chart.min.js"></script>
+<script type="text/javascript" src="jquery.min.js"></script>
+<style>
+#myChart {
+	background-color: #000000;
+}
+</style>
+<title>Temperature Chart</title>
+</head>
+<body bgcolor="black">
+	
+<canvas id="tempChart" width="1300" height="900"></canvas>
+
+<script>
+function plot(out) {
+var temp1sum=0;
+var temp2sum=0;
+var len=30;
+
+if (out["temp1"].length<30) {
+    len=out["temp1"].length;
+}
+
+for (var j=0;j<len;j++) {
+    temp1sum=temp1sum+out["temp1"][j].y;
+    temp2sum=temp2sum+(out["temp2"][j].y)/100;
+}
+
+for (var i=0; i<out["temp1"].length-30; i++) {
+    var currenttemp1=out["temp1"][i].y;
+    var currenttemp2=(out["temp2"][i].y)/100;
+    
+    out["temp1"][i].y=temp1sum/30;
+    out["temp2"][i].y=temp2sum/30;
+    
+    temp1sum=temp1sum-currenttemp1+out["temp1"][i+len].y;  
+    temp2sum=temp2sum-currenttemp2+(out["temp2"][i+len].y)/100; 
+}
+
+for (var i=out["temp1"].length-30; i<out["temp1"].length; i++) {
+    var currenttemp1=out["temp1"][i].y;
+    var currenttemp2=(out["temp2"][i].y)/100;
+    
+    var len=out["temp1"].length-i;
+    
+    out["temp1"][i].y=temp1sum/len;
+    out["temp2"][i].y=temp2sum/len;
+    
+    temp1sum=temp1sum-currenttemp1;
+    temp2sum=temp2sum-currenttemp2;
+}
+
+
+var ctx = document.getElementById("tempChart").getContext('2d');
+Chart.defaults.global.defaultFontSize = 16;
+Chart.defaults.global.defaultFontColor = "#FFFFFF";
+var myChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        datasets: [{
+			label: "High Res Temp",
+			lineTension: 0,
+			pointRadius: 0,
+			borderColor: "yellow",
+			borderWidth: 2,
+			cubicInterpolationMode: "monotone",
+            data: out["temp1"],
+			fill: false
+        },{
+			label: "Normal Res Temp",
+			lineTension: 0,
+			pointRadius: 0,
+			borderColor: "blue",
+			borderWidth: 2,
+			cubicInterpolationMode: "monotone",
+            data: out["temp2"],
+			fill: false
+		}],
+    },
+    options: {
+		responsive: false,
+		responsiveAnimationDuration:0,
+		animation: {
+			duration: 0,
+		},
+		hover: {
+			animationDuration: 400,
+		},
+        scales: {
+			xAxes: [{
+				type: "time",
+				display: true,
+				scaleLabel: {
+					display: true,
+					labelString: "Time",
+				},
+				gridLines: {
+					color: "rgba(255, 0, 0, 255)",
+					borderDash: [4, 8],
+				},
+			}],
+			yAxes: [{
+				display: true,
+				scaleLabel: {
+					display: true,
+					labelString: "Temperature [Degrees Celsius]",
+				},
+				gridLines: {
+					zeroLineColor: "rgba(255, 0, 0, 255)",
+					zeroLineBorderDash: [4, 8],
+					color: "rgba(255, 0, 0, 255)",
+					borderDash: [4, 8],
+				},
+			}]
+		},
+		legend: {
+			display: false,
+			position: "top",
+			labels: {
+				boxWidth: 2,
+			},
+		},
+		title: {
+			display: true,
+			fontSize: 24,
+			text: "Temperature",
+		}
+    }
+});
+
+ctx.font = "14px Arial";
+ctx.fillStyle = "white";
+var d = new Date();
+ctx.fillText("Current Time: " + d.toLocaleString(),90,30); 
+
+ctx.fillText("Last Recorded High Res Temp: " + out["temp1"][out["temp1"].length-1].y.toFixed(1),105,65);
+ctx.beginPath();
+ctx.moveTo(85,60);
+ctx.lineTo(95,60);
+ctx.strokeStyle="yellow";
+ctx.stroke();
+
+ctx.fillText("Last Recorded Normal Res Temp: " + out["temp2"][out["temp2"].length-1].y.toFixed(1),105,85);
+ctx.beginPath();
+ctx.moveTo(85,80);
+ctx.lineTo(95,80);
+ctx.strokeStyle="blue";
+ctx.stroke();
+}
+var jsondata= $.ajax({url: 'sql24.php', dataType: 'json', }).done(function (out) { plot(out); } );
+</script>
+</body>
+</html>

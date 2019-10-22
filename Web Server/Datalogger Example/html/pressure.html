@@ -1,0 +1,130 @@
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<META http-equiv="refresh" content="300">
+<script type="text/javascript" src="moment-with-locales.js"></script>
+<script type="text/javascript" src="Chart.min.js"></script>
+<script type="text/javascript" src="jquery.min.js"></script>
+<style>
+#myChart {
+	background-color: #000000;
+}
+</style>
+<title>Pressure Chart</title>
+</head>
+<body bgcolor="black">
+	
+<canvas id="pressureChart" width="1300" height="900"></canvas>
+
+<script>
+function plot(out) {
+var pressuresum=0;
+var len=30;
+
+if (out["pressure"].length<30) {
+    len=out["pressure"].length;
+}
+
+for (var j=0;j<len;j++) {
+    pressuresum=pressuresum+(out["pressure"][j].y)/10000;
+}
+
+for (var i=0; i<out["pressure"].length-30; i++) {
+    var currentpressure=(out["pressure"][i].y)/10000;
+    
+    out["pressure"][i].y=pressuresum/30;
+    
+    pressuresum=pressuresum-currentpressure+(out["pressure"][i+len].y)/10000;  
+}
+
+for (var i=out["pressure"].length-30; i<out["pressure"].length; i++) {
+    var currentpressure=(out["pressure"][i].y)/10000;
+    
+    var len=out["pressure"].length-i;
+    
+    out["pressure"][i].y=pressuresum/len;
+    
+    pressuresum=pressuresum-currentpressure;
+}
+
+var ctx = document.getElementById("pressureChart").getContext('2d');
+Chart.defaults.global.defaultFontSize = 16;
+Chart.defaults.global.defaultFontColor = "#FFFFFF";
+var myChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        datasets: [{
+			label: "PRESSURE",
+			lineTension: 0,
+			pointRadius: 0,
+			borderColor: "pink",
+			borderWidth: 2,
+			cubicInterpolationMode: "monotone",
+            data: out["pressure"],
+			fill: false
+        }],
+    },
+    options: {
+		responsive: false,
+		responsiveAnimationDuration:0,
+		animation: {
+			duration: 0,
+		},
+		hover: {
+			animationDuration: 400,
+		},
+        scales: {
+			xAxes: [{
+				type: "time",
+				display: true,
+				scaleLabel: {
+					display: true,
+					labelString: "Time",
+				},
+				gridLines: {
+					color: "rgba(255, 0, 0, 255)",
+					borderDash: [4, 8],
+				},
+			}],
+			yAxes: [{
+				display: true,
+				scaleLabel: {
+					display: true,
+					labelString: "Pressure [mb]",
+				},
+				gridLines: {
+					zeroLineColor: "rgba(255, 0, 0, 255)",
+					zeroLineBorderDash: [4, 8],
+					color: "rgba(255, 0, 0, 255)",
+					borderDash: [4, 8],
+				},
+			}]
+		},
+		legend: {
+			display: false,
+			position: "top",
+			labels: {
+				boxWidth: 2,
+			},
+		},
+		title: {
+			display: true,
+			fontSize: 24,
+			text: "Pressure",
+		}
+    }
+});
+ctx.font = "14px Arial";
+ctx.fillStyle = "white";
+var d = new Date();
+ctx.fillText("Current Time: " + d.toLocaleString(),90,30); 
+ctx.fillText("Last Recorded Pressure: " + out["pressure"][out["pressure"].length-1].y.toFixed(1),130,65);
+ctx.beginPath();
+ctx.moveTo(110,60);
+ctx.lineTo(120,60);
+ctx.stroke();
+}
+var jsondata= $.ajax({url: 'sql24.php', dataType: 'json', }).done(function (out) { plot(out); } );
+</script>
+</body>
+</html>

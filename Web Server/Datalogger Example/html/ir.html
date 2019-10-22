@@ -1,0 +1,131 @@
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<META http-equiv="refresh" content="300">
+<script type="text/javascript" src="moment-with-locales.js"></script>
+<script type="text/javascript" src="Chart.min.js"></script>
+<script type="text/javascript" src="jquery.min.js"></script>
+<style>
+#myChart {
+	background-color: #000000;
+}
+</style>
+<title>IR Intensity Chart</title>
+</head>
+<body bgcolor="black">
+	
+<canvas id="irChart" width="1300" height="900"></canvas>
+
+<script>
+function plot(out) {
+var irsum=0;
+var len=30;
+
+if (out["ir"].length<30) {
+    len=out["ir"].length;
+}
+
+for (var j=0;j<len;j++) {
+    irsum=irsum+out["ir"][j].y;
+}
+
+for (var i=0; i<out["ir"].length-30; i++) {
+    var currentir=out["ir"][i].y;
+    
+    out["ir"][i].y=irsum/30;
+    
+    irsum=irsum-currentir+out["ir"][i+len].y;  
+}
+
+for (var i=out["ir"].length-30; i<out["ir"].length; i++) {
+    var currentir=out["ir"][i].y;
+    
+    var len=out["ir"].length-i;
+    
+    out["ir"][i].y=irsum/len;
+    
+    irsum=irsum-currentir;
+}
+
+
+var ctx = document.getElementById("irChart").getContext('2d');
+Chart.defaults.global.defaultFontSize = 16;
+Chart.defaults.global.defaultFontColor = "#FFFFFF";
+var myChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        datasets: [{
+			label: "IR",
+			lineTension: 0,
+			pointRadius: 0,
+			borderColor: "red",
+			borderWidth: 2,
+			cubicInterpolationMode: "monotone",
+            data: out["ir"],
+			fill: false
+        }],
+    },
+    options: {
+		responsive: false,
+		responsiveAnimationDuration:0,
+		animation: {
+			duration: 0,
+		},
+		hover: {
+			animationDuration: 400,
+		},
+        scales: {
+			xAxes: [{
+				type: "time",
+				display: true,
+				scaleLabel: {
+					display: true,
+					labelString: "Time",
+				},
+				gridLines: {
+					color: "rgba(255, 0, 0, 255)",
+					borderDash: [4, 8],
+				},
+			}],
+			yAxes: [{
+				display: true,
+				scaleLabel: {
+					display: true,
+					labelString: "Intensity",
+				},
+				gridLines: {
+					zeroLineColor: "rgba(255, 0, 0, 255)",
+					zeroLineBorderDash: [4, 8],
+					color: "rgba(255, 0, 0, 255)",
+					borderDash: [4, 8],
+				},
+			}]
+		},
+		legend: {
+			display: false,
+			position: "top",
+			labels: {
+				boxWidth: 2,
+			},
+		},
+		title: {
+			display: true,
+			fontSize: 24,
+			text: "IR Intensity",
+		}
+    }
+});
+ctx.font = "14px Arial";
+ctx.fillStyle = "white";
+var d = new Date();
+ctx.fillText("Current Time: " + d.toLocaleString(),90,30); 
+ctx.fillText("Last Recorded IR: " + out["ir"][out["ir"].length-1].y.toFixed(1),115,65);
+ctx.beginPath();
+ctx.moveTo(95,60);
+ctx.lineTo(105,60);
+ctx.stroke();
+}
+var jsondata= $.ajax({url: 'sql24.php', dataType: 'json', }).done(function (out) { plot(out); } );
+</script>
+</body>
+</html>
