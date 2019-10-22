@@ -64,8 +64,14 @@ void Error_Handler(void);
 #define ADXL362_INT2_Pin GPIO_PIN_1
 #define ADXL362_INT2_GPIO_Port GPIOA
 #define ADXL362_INT2_EXTI_IRQn EXTI1_IRQn
-#define SPI2_CS_Pin GPIO_PIN_11
-#define SPI2_CS_GPIO_Port GPIOA
+#define ADXL362_SCK_Pin GPIO_PIN_13
+#define ADXL362_SCK_GPIO_Port GPIOB
+#define ADXL362_MISO_Pin GPIO_PIN_14
+#define ADXL362_MISO_GPIO_Port GPIOB
+#define ADXL362_MOSI_Pin GPIO_PIN_15
+#define ADXL362_MOSI_GPIO_Port GPIOB
+#define ADXL362_CS_Pin GPIO_PIN_11
+#define ADXL362_CS_GPIO_Port GPIOA
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

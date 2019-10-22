@@ -23,10 +23,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "stdio.h"
-#include "stdlib.h"
-#include "string.h"
-
+#include "ADXL362.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -36,43 +33,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-// ADXL362 Registers
-#define DEVID_AD 		0x00
-#define DEVID_MST		0x01
-#define PARTID			0x02
-#define REVID			0x03
-#define XDATA		 	0x08
-#define YDATA 			0x09
-#define ZDATA 			0x0A
-#define STATUS 			0x0B
-#define XDATA_L 		0x0E
-#define XDATA_H 		0x0F
-#define YDATA_L 		0x10
-#define YDATA_H 		0x11
-#define ZDATA_L 		0x12
-#define ZDATA_H 		0x13
-#define TEMP_L 			0x14
-#define TEMP_H 			0x15
-#define SOFT_RESET 		0x1F
-#define THRESH_ACT_L 	0x20
-#define THRESH_ACT_H 	0x21
-#define TIME_ACT 		0x22
-#define THRESH_INACT_L 	0x23
-#define THRESH_INACT_H 	0x24
-#define TIME_INACT_L 	0x25
-#define TIME_INACT_H 	0x26
-#define ACT_INACT_CTL	0x27
-#define FIFO_CONTROL	0x28
-#define FIFO_SAMPLES	0x29
-#define INTMAP1 		0x2A
-#define INTMAP2 		0x2B
-#define FILTER_CTL 		0x2C
-#define POWER_CTL 		0x2D
-#define SELF_TEST		0x2E
 
-#define WR_ADXL 		0x0A
-#define RD_ADXL 		0x0B
-#define FIFO_ADXL		0x0D
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -93,12 +54,11 @@ DMA_HandleTypeDef hdma_usart2_rx;
 DMA_HandleTypeDef hdma_usart2_tx;
 
 /* USER CODE BEGIN PV */
-
-int8_t x8 = 0, y8 = 0, z8 = 0;
-int16_t x12 = 0, y12 = 0, z12 = 0;
-volatile uint32_t drFlag, SPI2XxFlag;
-float xg, yg, zg;
-char message[50];
+int8_t x8 = 0, y8 = 0, z8 = 0, temp8 = 0;
+int16_t x12 = 0, y12 = 0, z12 = 0, temp12 = 0;
+volatile uint32_t drFlag, GarageState;
+//float xg, yg, zg;
+char message[100];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -109,37 +69,16 @@ static void MX_SPI2_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
-//void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi);
 void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi);
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
-uint8_t ADXL362_ReadReg(uint8_t address);
-void ADXL362_WriteReg(uint8_t address, uint8_t cmd);
-void ADXL362_Init(void);
-void ADXL362_GetXYZ8(int8_t *x, int8_t *y, int8_t *z);
-void ADXL362_GetXYZ12(int16_t *x, int16_t *y, int16_t *z);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-/*
-void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
-{
-	if(hspi->Instance==SPI2)
-	{
-		SPI2XxFlag = 1;
-		//HAL_GPIO_WritePin(SPI2_CS_GPIO_Port, SPI2_CS_Pin, GPIO_PIN_SET);		// Pull CS pin high to disable the slave
-		//HAL_Delay(10);
-	}
-}
-*/
-
 void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi)
 {
 	if(hspi->Instance==SPI2)
 	{
-		SPI2XxFlag = 1;
-		//HAL_GPIO_WritePin(SPI2_CS_GPIO_Port, SPI2_CS_Pin, GPIO_PIN_SET);		// Pull CS pin high to disable the slave
-		//HAL_Delay(10);
 	}
 }
 
@@ -147,7 +86,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 	if(GPIO_Pin == ADXL362_INT1_Pin)
 	{
-		drFlag = 8;
+		drFlag = 12;
 	}
 }
 
@@ -194,23 +133,21 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  if(SPI2XxFlag == 1){
-		  if(drFlag == 8)
-		  {
-			  ADXL362_GetXYZ8(&x8, &y8, &z8);
-			  sprintf(message, "%+04d %+04d %+04d\r\n", x8,y8,z8);
-			  HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), 0xFFFF);
-			  drFlag = 0;
-		  }
+	  if(drFlag == 8)
+	  {
+		  drFlag = 0;
+		  ADXL362_GetXYZ8(&x8, &y8, &z8);
+		  sprintf(message, "x = %+04d, y = %+04d, z = %+04d\r\n", x8, y8, z8);
+		  HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), 0xFFFF);
+	  }
 
-		  else if(drFlag == 12)
-		  {
-			  ADXL362_GetXYZ12(&x12, &y12, &z12);
-			  sprintf(message, "%+05d %+05d %+05d\r\n", x12, y12, z12);
-			  //sprintf(message, "%04X, %04X, %04X\r\n", x12, y12, z12);
-			  HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), 0xFFFF);
-			  drFlag = 0;
-		  }
+	  else if(drFlag == 12)
+	  {
+		  drFlag = 0;
+		  ADXL362_GetXYZT12(&x12, &y12, &z12, &temp12);
+		  sprintf(message, "x = %+05d, y = %+05d, z = %+05d, temp = %+05d\r\n", x12, y12, z12, temp12);
+		  //sprintf(message, "%04X, %04X, %04X\r\n", x12, y12, z12);
+		  HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), 0xFFFF);
 	  }
     /* USER CODE END WHILE */
 
@@ -425,11 +362,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitTypeDef GPIO_InitStruct = {0};
 
   /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(SPI2_CS_GPIO_Port, SPI2_CS_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(ADXL362_CS_GPIO_Port, ADXL362_CS_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pins : ADXL362_INT1_Pin ADXL362_INT2_Pin */
   GPIO_InitStruct.Pin = ADXL362_INT1_Pin|ADXL362_INT2_Pin;
@@ -437,12 +375,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : SPI2_CS_Pin */
-  GPIO_InitStruct.Pin = SPI2_CS_Pin;
+  /*Configure GPIO pin : ADXL362_CS_Pin */
+  GPIO_InitStruct.Pin = ADXL362_CS_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-  HAL_GPIO_Init(SPI2_CS_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(ADXL362_CS_GPIO_Port, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
   HAL_NVIC_SetPriority(EXTI0_IRQn, 0, 0);
@@ -454,173 +392,7 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-uint8_t ADXL362_ReadReg (uint8_t address)
-{
-	//HAL_NVIC_DisableIRQ(ADXL362_INT1_EXTI_IRQn);
-	//HAL_NVIC_DisableIRQ(ADXL362_INT2_EXTI_IRQn);
 
-	uint8_t rxBuf[3], txBuf[3];
-
-	txBuf[2] = 0x0;
-	txBuf[1] = address;		// Address
-	txBuf[0] = RD_ADXL;		// Read instruction
-
-	SPI2XxFlag = 0;
-	HAL_GPIO_WritePin(SPI2_CS_GPIO_Port, SPI2_CS_Pin, GPIO_PIN_RESET);	// Pull CS pin low to enable the slave
-	HAL_SPI_TransmitReceive_DMA(&hspi2, txBuf, rxBuf, 3);
-	while(HAL_SPI_GetState(&hspi2) != HAL_SPI_STATE_READY);
-	HAL_GPIO_WritePin(SPI2_CS_GPIO_Port, SPI2_CS_Pin, GPIO_PIN_SET);	// Pull CS pin high to disable the slave
-	//HAL_NVIC_EnableIRQ(ADXL362_INT1_EXTI_IRQn);
-	//HAL_NVIC_EnableIRQ(ADXL362_INT2_EXTI_IRQn);
-
-	return rxBuf[2];
-}
-
-/**
-  * @brief ADXL362 Write Register Function
-  * @param address Address of register to write
-  * @param cmd Command byte to write to register
-  * @retval None
-  */
-void ADXL362_WriteReg (uint8_t address, uint8_t cmd)
-{
-	//HAL_NVIC_DisableIRQ(ADXL362_INT1_EXTI_IRQn);
-	//HAL_NVIC_DisableIRQ(ADXL362_INT2_EXTI_IRQn);
-
-	uint8_t txBuf[3], rxBuf[3];
-
-	txBuf[2] = cmd;			// Command
-	txBuf[1] = address;		// Address
-	txBuf[0] = WR_ADXL;		// Write instruction
-
-	SPI2XxFlag = 0;
-	HAL_GPIO_WritePin(SPI2_CS_GPIO_Port, SPI2_CS_Pin, GPIO_PIN_RESET);	// Pull CS pin low to enable the slave
-	HAL_SPI_TransmitReceive_DMA(&hspi2, txBuf, rxBuf, 3); 						// Transmit the write instruction, address, and command
-	while(HAL_SPI_GetState(&hspi2) != HAL_SPI_STATE_READY);
-	HAL_GPIO_WritePin(SPI2_CS_GPIO_Port, SPI2_CS_Pin, GPIO_PIN_SET);	// Pull CS pin high to disable the slave
-
-	//HAL_NVIC_EnableIRQ(ADXL362_INT1_EXTI_IRQn);
-	//HAL_NVIC_EnableIRQ(ADXL362_INT2_EXTI_IRQn);
-}
-
-/**
-  * @brief ADXL362 Initialization Function
-  * @param None
-  * @retval None
-  */
-void ADXL362_Init(void)
-{
-	uint8_t reg = 0;	// Hold register value
-	char msg[50];	// Message to print
-
-	// Configure ADXL_Int1
-	drFlag = 0;		// Reset data ready flag
-	SPI2XxFlag = 1;	// Reset SPI transmission flag
-
-	// Disable ADXL External Interrupts
-	HAL_NVIC_DisableIRQ(ADXL362_INT1_EXTI_IRQn);
-	HAL_NVIC_DisableIRQ(ADXL362_INT2_EXTI_IRQn);
-
-	// Reset ADXL362 by writing 0x52(R in ASCII) to the Soft Reset Register
-	sprintf(msg, "Initiating ADXL362!\r\n");
-	HAL_UART_Transmit(&huart2, (uint8_t*)msg, strlen(msg), 0xFFFF);
-	ADXL362_WriteReg(SOFT_RESET, 0x52);
-	HAL_Delay(1);
-
-	// Read ADXL362 registers
-	reg = ADXL362_ReadReg(DEVID_AD); 	// Read ID Register
-	sprintf(msg, "ID0 = 0x%X\r\n", reg);
-	HAL_UART_Transmit(&huart2, (uint8_t*)msg, strlen(msg), 0xFFFF);
-
-	// Configure ADXL362 Filter Control Register
-	reg = ADXL362_ReadReg(FILTER_CTL);   	// Read Filter Control Register
-	sprintf(msg, "FILTER_CTL = 0x%X\r\n", reg);
-	HAL_UART_Transmit(&huart2, (uint8_t*)msg, strlen(msg), 0xFFFF);
-	// ADXL362_WriteReg(FILTER_CTL,0x51);	// Set ADXL362 to 4g range, 25Hz
-	ADXL362_WriteReg(FILTER_CTL,0x11);		// Set ADXL362 to 2g range, 25Hz
-	reg = ADXL362_ReadReg(FILTER_CTL);
-	sprintf(msg, "FILTER_CTL = 0x%X\r\n", reg);
-	HAL_UART_Transmit(&huart2, (uint8_t*)msg, strlen(msg), 0xFFFF);
-
-	// Configure ADXL362 interrupts
-	ADXL362_WriteReg(INTMAP1,0x01);		// Map Data ready Interrupt to INT1 pin
-	reg = ADXL362_ReadReg(INTMAP1);
-	sprintf(msg, "INTMAP1 = 0x%X\r\n", reg);
-	HAL_UART_Transmit(&huart2, (uint8_t*)msg, strlen(msg), 0xFFFF);
-	ADXL362_WriteReg(INTMAP2,0x40);		// Map Awake Interrupt to INT2 pin
-	reg = ADXL362_ReadReg(INTMAP2);
-	sprintf(msg, "INTMAP2 = 0x%X\r\n", reg);
-	HAL_UART_Transmit(&huart2, (uint8_t*)msg, strlen(msg), 0xFFFF);
-
-	// Configure ADXL362 Power Control Register
-	ADXL362_WriteReg(POWER_CTL,0x22);	// Set to measurement mode, ultralow noise
-	reg = ADXL362_ReadReg(POWER_CTL);
-	sprintf(msg, "POWER_CTL = 0x%X\r\n", reg);
-	HAL_UART_Transmit(&huart2, (uint8_t*)msg, strlen(msg), 0xFFFF);
-
-	// Begin continuous processing of ADXL362 data
-	HAL_NVIC_EnableIRQ(ADXL362_INT1_EXTI_IRQn);
-	HAL_NVIC_EnableIRQ(ADXL362_INT2_EXTI_IRQn);
-
-}
-
-/**
-  * @brief ADXL362 Get XYZ 8bits Function
-  * @param address Address of register to write
-  * @param x Points to X-axis data buffer
-  * @param y Points to Y-axis data buffer
-  * @param z Points to Z-axis data buffer
-  * @retval None
-  */
-void ADXL362_GetXYZ8(int8_t *x, int8_t *y, int8_t *z)
-{
-	//HAL_NVIC_DisableIRQ(ADXL362_INT1_EXTI_IRQn);
-	//HAL_NVIC_DisableIRQ(ADXL362_INT2_EXTI_IRQn);
-
-	uint8_t xyzVal[5] = {0,0,0,0,0};
-	uint8_t txBuf[5] = {0,0,0,0,0};
-
-	txBuf[1] = XDATA;		// Address
-	txBuf[0] = RD_ADXL;		// Read instruction
-
-	SPI2XxFlag = 0;
-	HAL_GPIO_WritePin(SPI2_CS_GPIO_Port, SPI2_CS_Pin, GPIO_PIN_RESET);	// Pull CS pin low to enable the slave
-	HAL_SPI_TransmitReceive_DMA(&hspi2, txBuf, xyzVal, 5);
-
-	//HAL_NVIC_EnableIRQ(ADXL362_INT1_EXTI_IRQn);
-	//HAL_NVIC_EnableIRQ(ADXL362_INT2_EXTI_IRQn);
-	while(HAL_SPI_GetState(&hspi2) != HAL_SPI_STATE_READY);
-	HAL_GPIO_WritePin(SPI2_CS_GPIO_Port, SPI2_CS_Pin, GPIO_PIN_SET);	// Pull CS pin high to disable the slave
-	*x = xyzVal[2];
-	*y = xyzVal[3];
-	*z = xyzVal[4];
-}
-
-/**
-  * @brief ADXL362 Get XYZ 12bits Function
-  * @param x Points to X-axis data buffer
-  * @param y Points to Y-axis data buffer
-  * @param z Points to Z-axis data buffer
-  * @retval None
-  */
-void ADXL362_GetXYZ12(int16_t *x, int16_t *y, int16_t *z)
-{
-	uint8_t xyzVal[8] = {0,0,0,0,0,0,0,0};
-	uint8_t txBuf[8] = {0,0,0,0,0,0,0,0};
-
-	txBuf[1] = XDATA_L;		// Address
-	txBuf[0] = RD_ADXL;		// Read instruction
-
-	SPI2XxFlag = 0;
-	HAL_GPIO_WritePin(SPI2_CS_GPIO_Port, SPI2_CS_Pin, GPIO_PIN_RESET);	// Pull CS pin low to enable the slave
-	HAL_SPI_TransmitReceive_DMA(&hspi2, txBuf, xyzVal, 8);
-	//HAL_GPIO_WritePin(SPI2_CS_GPIO_Port, SPI2_CS_Pin, GPIO_PIN_SET);		// Pull CS pin high to disable the slave
-
-	*x = ((uint16_t)xyzVal[3] << 8) + xyzVal[2];
-	*y = ((uint16_t)xyzVal[5] << 8) + xyzVal[4];
-	*z = ((uint16_t)xyzVal[7] << 8) + xyzVal[6];
-	//*temp = ((uint16_t)xyzVal[9] << 8) + xyzVal[8];
-}
 /* USER CODE END 4 */
 
 /**

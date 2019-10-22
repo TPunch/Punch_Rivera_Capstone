@@ -4,6 +4,7 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
+../Src/ADXL362.c \
 ../Src/main.c \
 ../Src/stm32l4xx_hal_msp.c \
 ../Src/stm32l4xx_it.c \
@@ -11,6 +12,7 @@ C_SRCS += \
 ../Src/system_stm32l4xx.c 
 
 OBJS += \
+./Src/ADXL362.o \
 ./Src/main.o \
 ./Src/stm32l4xx_hal_msp.o \
 ./Src/stm32l4xx_it.o \
@@ -18,6 +20,7 @@ OBJS += \
 ./Src/system_stm32l4xx.o 
 
 C_DEPS += \
+./Src/ADXL362.d \
 ./Src/main.d \
 ./Src/stm32l4xx_hal_msp.d \
 ./Src/stm32l4xx_it.d \

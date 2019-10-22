@@ -1,4 +1,5 @@
-Src/main.o: ../Src/main.c \
+Src/ADXL362.o: ../Src/ADXL362.c \
+ D:/ECE486_Labs/Cap/Punch_Rivera_Capstone/ADXL362\ Testing/L433RC\ Nucleo/Inc/ADXL362.h \
  D:/ECE486_Labs/Cap/Punch_Rivera_Capstone/ADXL362\ Testing/L433RC\ Nucleo/Inc/main.h \
  D:/ECE486_Labs/Cap/Punch_Rivera_Capstone/ADXL362\ Testing/L433RC\ Nucleo/Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h \
  D:/ECE486_Labs/Cap/Punch_Rivera_Capstone/ADXL362\ Testing/L433RC\ Nucleo/Inc/stm32l4xx_hal_conf.h \
@@ -31,9 +32,9 @@ Src/main.o: ../Src/main.c \
  D:/ECE486_Labs/Cap/Punch_Rivera_Capstone/ADXL362\ Testing/L433RC\ Nucleo/Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_spi.h \
  D:/ECE486_Labs/Cap/Punch_Rivera_Capstone/ADXL362\ Testing/L433RC\ Nucleo/Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_spi_ex.h \
  D:/ECE486_Labs/Cap/Punch_Rivera_Capstone/ADXL362\ Testing/L433RC\ Nucleo/Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart.h \
- D:/ECE486_Labs/Cap/Punch_Rivera_Capstone/ADXL362\ Testing/L433RC\ Nucleo/Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart_ex.h \
- D:/ECE486_Labs/Cap/Punch_Rivera_Capstone/ADXL362\ Testing/L433RC\ Nucleo/Inc/ADXL362.h \
- D:/ECE486_Labs/Cap/Punch_Rivera_Capstone/ADXL362\ Testing/L433RC\ Nucleo/Inc/main.h
+ D:/ECE486_Labs/Cap/Punch_Rivera_Capstone/ADXL362\ Testing/L433RC\ Nucleo/Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart_ex.h
+
+D:/ECE486_Labs/Cap/Punch_Rivera_Capstone/ADXL362\ Testing/L433RC\ Nucleo/Inc/ADXL362.h:
 
 D:/ECE486_Labs/Cap/Punch_Rivera_Capstone/ADXL362\ Testing/L433RC\ Nucleo/Inc/main.h:
 
@@ -100,7 +101,3 @@ D:/ECE486_Labs/Cap/Punch_Rivera_Capstone/ADXL362\ Testing/L433RC\ Nucleo/Drivers
 D:/ECE486_Labs/Cap/Punch_Rivera_Capstone/ADXL362\ Testing/L433RC\ Nucleo/Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart.h:
 
 D:/ECE486_Labs/Cap/Punch_Rivera_Capstone/ADXL362\ Testing/L433RC\ Nucleo/Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart_ex.h:
-
-D:/ECE486_Labs/Cap/Punch_Rivera_Capstone/ADXL362\ Testing/L433RC\ Nucleo/Inc/ADXL362.h:
-
-D:/ECE486_Labs/Cap/Punch_Rivera_Capstone/ADXL362\ Testing/L433RC\ Nucleo/Inc/main.h:
