@@ -55,9 +55,9 @@ DMA_HandleTypeDef hdma_usart2_tx;
 
 /* USER CODE BEGIN PV */
 int8_t x8 = 0, y8 = 0, z8 = 0;
-int16_t x12 = 0, y12 = 0, z12 = 0, temp = 0;
+int16_t x12 = 0, y12 = 0, z12 = 0, temp12 = 0;
 volatile uint32_t drFlag, GarageState, ADXL362_AFlag;
-//float xg, yg, zg;
+float xg, yg, zg, temp;
 char message[100];
 /* USER CODE END PV */
 
@@ -147,7 +147,11 @@ int main(void)
 		  HAL_Delay(10);
 		  HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET);
 		  ADXL362_GetXYZT(&x12, &y12, &z12, &temp);
-		  sprintf(message, "x = %+05d, y = %+05d, z = %+05d, temp = %+05d\r\n", x12, y12, z12, temp);
+		  xg = 0.001 * x12;
+		  yg = 0.001 * y12;
+		  zg = 0.001 * z12;
+		  temp = 0.065 * temp;
+		  sprintf(message, "x = %+f, y = %+f, z = %+f, temp = %+f\r\n", xg, yg, zg, temp);
 		  HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), 0xFFFF);
 	  }
 	  HAL_Delay(20);
