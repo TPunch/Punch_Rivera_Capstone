@@ -43,6 +43,15 @@
 #define WR_ADXL 		0x0A
 #define RD_ADXL 		0x0B
 #define FIFO_ADXL		0x0D
+// ADXL362 ACC Offsets
+#define X_OFFSET		0.023
+#define Y_OFFSET		0.033
+#define Z_OFFSET		0.145
+// ADXL362 USER Defined Constants
+#define USER_ACT_TIME		100		// 1 seconds
+#define USER_ACT_THRESH		350		// 350 mg
+#define USER_INACT_TIME		360		// 5 seconds
+#define USER_INACT_THRESH	300		// 300 mg
 
 /* Function prototypes -----------------------------------------------*/
 uint8_t ADXL362_ReadReg(uint8_t address);

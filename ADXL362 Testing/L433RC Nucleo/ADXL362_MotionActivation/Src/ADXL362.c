@@ -141,8 +141,8 @@ void ADXL362_Init(void)
 	HAL_UART_Transmit(&huart2, (uint8_t*)msg, strlen(msg), 0xFFFF);
 
 	// Configure Activity and Inactivity Thresholds & Timers
-	ADXL362_ActivityInit(350, 100);		// 300 code Activity Threshold. ODR = 100Hz, so 10 results & time threshold = 1 seconds
-	ADXL362_InactivityInit(300, 1000);	// 80 code Inactivity Threshold. ODR = 100Hz, so 30 results & time threshold = 2 seconds
+	ADXL362_ActivityInit(USER_ACT_THRESH, USER_ACT_TIME);		// 300 code Activity Threshold. ODR = 100Hz, so 10 results & time threshold = 1 seconds
+	ADXL362_InactivityInit(USER_INACT_THRESH, USER_INACT_TIME);	// 80 code Inactivity Threshold. ODR = 100Hz, so 30 results & time threshold = 2 seconds
 
 	// Configure ADXL362 Activity/Inactivity Control Register
 	ADXL362_WriteReg(ACT_INACT_CTL,0x3F);	// Set Referenced Activity and Inactivity, and Loop Mode
