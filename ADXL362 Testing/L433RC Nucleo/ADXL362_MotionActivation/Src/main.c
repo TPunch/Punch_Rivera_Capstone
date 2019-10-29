@@ -23,6 +23,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "math.h"
 #include "ADXL362.h"
 /* USER CODE END Includes */
 
@@ -57,7 +58,7 @@ DMA_HandleTypeDef hdma_usart2_tx;
 int8_t x8 = 0, y8 = 0, z8 = 0;
 int16_t x12 = 0, y12 = 0, z12 = 0, temp12 = 0;
 volatile uint32_t drFlag, data_counter = 0, dataTxReady, GarageState, ADXL362_AFlag;
-float xyzt[100];
+double xyzt[400], xAng, yAng, zAng;
 char message[100];
 /* USER CODE END PV */
 
@@ -154,9 +155,10 @@ int main(void)
 		  xyzt[data_counter++] = (0.001 * y12) + Y_OFFSET;
 		  xyzt[data_counter++] = (0.001 * z12) + Z_OFFSET;
 		  xyzt[data_counter++] = 0.065 * temp12;
+		  //xAng[data_counter]
 		  //data_counter++;
 		  if(data_counter == 100){
-			  sprintf(message, "x = %+f, y = %+f, z = %+f, temp = %+f\r\n", xyzt[96], xyzt[97], xyzt[98], xyzt[99]);
+			  sprintf(message, "x = %+lf, y = %+lf, z = %+lf, temp = %+lf\r\n", xyzt[96], xyzt[97], xyzt[98], xyzt[99]);
 			  HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), 0xFFFF);
 			  data_counter = 0;
 		  }

@@ -120,7 +120,7 @@ void ADXL362_GetXYZT(int16_t *x, int16_t *y, int16_t *z, int16_t *temp)
 void ADXL362_Init(void)
 {
 	uint8_t reg = 0;	// Hold register value
-	char msg[50];	// Message to print
+	char msg[50];		// Message to print
 
 	// Configure ADXL362_INT1
 	ADXL362_AFlag = 0;		// Reset AWAKE flag

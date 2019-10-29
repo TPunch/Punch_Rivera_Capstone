@@ -12,8 +12,8 @@
 <targetDefinitions>
   <board id="nucleo-l433rc-p">
     <name>NUCLEO-L433RC-P</name>
-    <dbgIF>SWD</dbgIF>
     <dbgIF>JTAG</dbgIF>
+    <dbgIF>SWD</dbgIF>
     <dbgDEV>ST-Link</dbgDEV>
     <mcuId>stm32l433rctxp</mcuId>
   </board>
