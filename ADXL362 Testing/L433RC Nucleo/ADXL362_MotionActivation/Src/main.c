@@ -59,7 +59,7 @@ int8_t x8 = 0, y8 = 0, z8 = 0;
 int16_t x12 = 0, y12 = 0, z12 = 0, temp12 = 0;
 volatile uint32_t drFlag, data_counter = 0, dataTxReady, GarageState, ADXL362_AFlag;
 double xyzt[400], xAng, yAng, zAng;
-char message[100];
+char message[200], data[200];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -98,6 +98,10 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 /**
   * @brief  The application entry point.
   * @retval int
+  */
+/**
+  * @brief System Clock Configuration
+  * @retval None
   */
 int main(void)
 {
@@ -148,22 +152,25 @@ int main(void)
 		  HAL_PWR_EnterSLEEPMode(PWR_LOWPOWERREGULATOR_ON, PWR_SLEEPENTRY_WFI);
 		  HAL_ResumeTick();
 	  } else{
-		  HAL_Delay(10);
 		  HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET);
 		  ADXL362_GetXYZT(&x12, &y12, &z12, &temp12);
 		  xyzt[data_counter++] = (0.001 * x12) + X_OFFSET;
 		  xyzt[data_counter++] = (0.001 * y12) + Y_OFFSET;
 		  xyzt[data_counter++] = (0.001 * z12) + Z_OFFSET;
-		  xyzt[data_counter++] = 0.065 * temp12;
+		  xyzt[data_counter++] = (0.065 * temp12) + TEMP_OFFSET;
 		  //xAng[data_counter]
 		  //data_counter++;
-		  if(data_counter == 100){
-			  sprintf(message, "x = %+lf, y = %+lf, z = %+lf, temp = %+lf\r\n", xyzt[96], xyzt[97], xyzt[98], xyzt[99]);
+		  if(data_counter == 400){
+			  xAng = atan(xyzt[data_counter-4] / sqrt((xyzt[data_counter-3] * xyzt[data_counter-3]) + (xyzt[data_counter-2] * xyzt[data_counter-2]))) * 57.2957795+180;
+			  yAng = atan(xyzt[data_counter-3] / sqrt((xyzt[data_counter-4] * xyzt[data_counter-4]) + (xyzt[data_counter-2] * xyzt[data_counter-2]))) * 57.2957795+180;
+			  zAng = atan(sqrt((xyzt[data_counter-4] * xyzt[data_counter-4]) + (xyzt[data_counter-3] * xyzt[data_counter-3])) / xyzt[data_counter-2]) * 57.2957795+180;
+			  sprintf(message, " X%+lf Y%+lf Z%lf T%+lf \r\n", xAng, yAng, zAng, xyzt[data_counter-1]);
 			  HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), 0xFFFF);
+			  HAL_UART_Transmit(&huart1, (uint8_t*)message, strlen(message), 0xFFFF);
 			  data_counter = 0;
 		  }
 	  }
-	  HAL_Delay(20);
+	  HAL_Delay(5);
 
     /* USER CODE END WHILE */
 
@@ -172,10 +179,6 @@ int main(void)
   /* USER CODE END 3 */
 }
 
-/**
-  * @brief System Clock Configuration
-  * @retval None
-  */
 void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
