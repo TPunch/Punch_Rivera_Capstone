@@ -1,0 +1,23 @@
+Added Component: Designator=U1(MRA08B)
+Add component. Clean all parameters for all variants
+Add component (AddParameter): Name = "Built_By"; Value = "EMA_UL_Team"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Copyright"; Value = "Copyright (C) 2018 Accelerated Designs. All rights reserved"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Manufacturer_Part_Number"; Value = "LP38511MRX-ADJ/NOPB"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "RefDes"; Value = "RefDes"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Type"; Value = "DEV"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Value"; Value = "Value"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Vendor"; Value = "Texas Instruments"; VariantName = "[No Variations]"
+Added Pin To Net: NetName=VDD33 Pin=CFF-2
+Added Pin To Net: NetName=VDD33 Pin=R5-1
+Added Pin To Net: NetName=VDD33 Pin=U1-3
+Added Pin To Net: NetName=GND Pin=U1-5
+Added Pin To Net: NetName=Net18650_1 Pin=U1-6
+Added Pin To Net: NetName=Net18650_1 Pin=U1-7
+Added Pin To Net: NetName=Net18650_1 Pin=U1-8
+Added Pin To Net: NetName=NetCFF_1 Pin=CFF-1
+Added Pin To Net: NetName=NetCFF_1 Pin=R5-2
+Added Pin To Net: NetName=NetCFF_1 Pin=R6-2
+Added Pin To Net: NetName=NetCFF_1 Pin=U1-1
+Added Pin To Net: NetName=NetCFF_1 Pin=U1-2
+Added Net: Name=NetCFF_1
+Added Member To Class: ClassName=Capstone Member=Component U1 Part Number: LP38511MRX-ADJ/NOPB
