@@ -1,0 +1,31 @@
+Change Component Comment : Designator=S1 Old Comment=SW-PB New Comment=KSR222GLFS
+Change Component Comment : Designator=S2 Old Comment=SW-PB New Comment=KSR222GLFS
+Change Component Comment : Designator=S3 Old Comment=SW-PB New Comment=KSR222GLFS
+Change component parameters: Designator = "S1"; Footprint = "*SW_KSR223GLFG"; UniqueID = "\CLWQYYDN"
+Change component parameters. Clean all parameters for all variants
+Change component parameters (AddParameter): Name = "Digi-Key_Part_Number"; Value = "401-1704-1-ND"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Digi-Key_Purchase_URL"; Value = "https://www.digikey.com/product-detail/en/c-k/KSR223GLFG/401-1704-1-ND/958078?utm_source=snapeda&utm_medium=aggregator&utm_campaign=symbol"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "MF"; Value = "C&K"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "MP"; Value = "KSR223GLFG"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Package"; Value = "None"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "SnapEDA_Link"; Value = "https://www.snapeda.com/parts/KSR223GLFG/C%26K/view-part/?ref=snap"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Value"; Value = ""; VariantName = "[No Variations]"
+Change component parameters: Designator = "S2"; Footprint = "*SW_KSR223GLFG"; UniqueID = "\AWUVWCRL"
+Change component parameters. Clean all parameters for all variants
+Change component parameters (AddParameter): Name = "Digi-Key_Part_Number"; Value = "401-1704-1-ND"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Digi-Key_Purchase_URL"; Value = "https://www.digikey.com/product-detail/en/c-k/KSR223GLFG/401-1704-1-ND/958078?utm_source=snapeda&utm_medium=aggregator&utm_campaign=symbol"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "MF"; Value = "C&K"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "MP"; Value = "KSR223GLFG"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Package"; Value = "None"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "SnapEDA_Link"; Value = "https://www.snapeda.com/parts/KSR223GLFG/C%26K/view-part/?ref=snap"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Value"; Value = ""; VariantName = "[No Variations]"
+Change component parameters: Designator = "S3"; Footprint = "*SW_KSR223GLFG"; UniqueID = "\QAHSSAOK"
+Change component parameters. Clean all parameters for all variants
+Change component parameters (AddParameter): Name = "Digi-Key_Part_Number"; Value = "401-1704-1-ND"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Digi-Key_Purchase_URL"; Value = "https://www.digikey.com/product-detail/en/c-k/KSR223GLFG/401-1704-1-ND/958078?utm_source=snapeda&utm_medium=aggregator&utm_campaign=symbol"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "MF"; Value = "C&K"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "MP"; Value = "KSR223GLFG"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Package"; Value = "None"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "SnapEDA_Link"; Value = "https://www.snapeda.com/parts/KSR223GLFG/C%26K/view-part/?ref=snap"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Value"; Value = ""; VariantName = "[No Variations]"
+Added Member To Class: ClassName=Capstone Member=Component IC1 STM32L433RCT6

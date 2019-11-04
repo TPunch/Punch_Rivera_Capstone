@@ -1,0 +1,4 @@
+Added Pin To Net: NetName=VDD33 Pin=IC1-1
+Added Pin To Net: NetName=NetC19_2 Pin=S1-2
+Added Pin To Net: NetName=IO0 Pin=S2-2
+Added Pin To Net: NetName=EN Pin=S3-2

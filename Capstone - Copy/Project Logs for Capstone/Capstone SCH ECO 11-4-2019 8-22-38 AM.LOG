@@ -1,0 +1,11 @@
+Change Component Footprint: Designator=R2 Old Footprint=AXIAL-0.3 New Footprint=6-0805_N
+Change Component Footprint: Designator=R3 Old Footprint=AXIAL-0.3 New Footprint=6-0805_N
+Change Component Footprint: Designator=R5 Old Footprint=AXIAL-0.3 New Footprint=6-0805_N
+Change Component Footprint: Designator=R8 Old Footprint=AXIAL-0.3 New Footprint=6-0805_N
+Change Component Footprint: Designator=R9 Old Footprint=AXIAL-0.3 New Footprint=6-0805_N
+Change Component Footprint: Designator=R1 Old Footprint=AXIAL-0.3 New Footprint=RES_WSC_2515
+Change Component Footprint: Designator=C19 Old Footprint=RAD-0.3 New Footprint=*CAPC2012X88N
+Change Component Footprint: Designator=C4 Old Footprint=RB7.6-15 New Footprint=C1206
+Change Component Footprint: Designator=C7 Old Footprint=RB7.6-15 New Footprint=C1206
+Add Pin To Net: Pin=IC1-58 Old Net=NetIC1_58 New Net=USART1_TX
+Add Pin To Net: Pin=IC1-59 Old Net=NetIC1_59 New Net=USART1_RX
