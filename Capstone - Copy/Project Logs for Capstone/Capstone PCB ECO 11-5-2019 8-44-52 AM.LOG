@@ -1,0 +1,2 @@
+Removed Pin From Net: NetName=VDD33 Pin=SWD-2
+Added Pin To Net: NetName=VDD_micro Pin=SWD-2

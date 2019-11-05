@@ -1,0 +1,10 @@
+Change Component Footprint: Designator=Resp Old Footprint=AXIAL-0.3 New Footprint=6-0805_N
+Change Component Footprint: Designator=Rmicro Old Footprint=AXIAL-0.3 New Footprint=6-0805_N
+Change Component Comment: Designator=SWD Old Comment=Header 4 New Comment=Comment
+Change Component Comment: Designator=UART Old Comment=Header 4 New Comment=Comment
+Change Component Comment: Designator=P2 Old Comment=Header 7 New Comment=Comment
+Change Component Comment: Designator=Resp Old Comment=Res1 New Comment=Comment
+Change Component Comment: Designator=Rmicro Old Comment=Res1 New Comment=Comment
+Add Pin To Net: Pin=R3-1 Old Net=VDD_ESP New Net=VDD33
+Change Pin Designator/Name:  Old Designator=Rmicro-1 Old Name=1 New Designator =2 New Name=2
+Change Pin Designator/Name:  Old Designator=Rmicro-2 Old Name=2 New Designator =1 New Name=1

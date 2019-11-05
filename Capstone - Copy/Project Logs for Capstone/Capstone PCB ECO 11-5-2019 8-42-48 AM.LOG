@@ -1,0 +1,12 @@
+Removed Pin From Net: NetName=VDD33 Pin=IC1-1
+Removed Pin From Net: NetName=VDD33 Pin=IC1-19
+Removed Pin From Net: NetName=VDD33 Pin=IC1-32
+Removed Pin From Net: NetName=VDD33 Pin=IC1-48
+Removed Pin From Net: NetName=VDD33 Pin=IC1-64
+Removed Pin From Net: NetName=VDD33 Pin=R5-2
+Added Pin To Net: NetName=VDD_micro Pin=IC1-1
+Added Pin To Net: NetName=VDD_micro Pin=IC1-19
+Added Pin To Net: NetName=VDD_micro Pin=IC1-32
+Added Pin To Net: NetName=VDD_micro Pin=IC1-48
+Added Pin To Net: NetName=VDD_micro Pin=IC1-64
+Added Pin To Net: NetName=VDD_micro Pin=R5-2
