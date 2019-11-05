@@ -1,4 +1,0 @@
-Change Net Name : Old Net Name=IO0 New Net Name=VDD33
-Added Pin To Net: NetName=IO0 Pin=C10-2
-Added Pin To Net: NetName=IO0 Pin=S1-2
-Added Net: Name=IO0
