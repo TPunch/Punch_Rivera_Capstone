@@ -1,0 +1,30 @@
+Added Component: Designator=S6(PTS636SK25JSMTRLFS)
+Add component. Clean all parameters for all variants
+Add component (AddParameter): Name = "Datasheet Link"; Value = "https://componentsearchengine.com/Datasheets/1/PTS636 SK25J SMTR LFS.pdf"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Height"; Value = "2.7mm"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Manufacturer_Name"; Value = "C & K COMPONENTS"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Manufacturer_Part_Number"; Value = "PTS636 SK25J SMTR LFS"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Mouser Part Number"; Value = "611-PTS636SK25JSMTRL"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Mouser Price/Stock"; Value = "https://www.mouser.com/Search/Refine.aspx?Keyword=611-PTS636SK25JSMTRL"; VariantName = "[No Variations]"
+Added Pin To Net: NetName=NetR10_2 Pin=S6-1
+Added Pin To Net: NetName=NetS6_2 Pin=S6-2
+Added Member To Class: ClassName=Capstone Member=Component C1 Cap
+Added Member To Class: ClassName=Capstone Member=Component C3 Cap
+Added Member To Class: ClassName=Capstone Member=Component C5 Cap
+Added Member To Class: ClassName=Capstone Member=Component C6 Cap
+Added Member To Class: ClassName=Capstone Member=Component C9 Cap
+Added Member To Class: ClassName=Capstone Member=Component C10 Cap
+Added Member To Class: ClassName=Capstone Member=Component C11 Cap
+Added Member To Class: ClassName=Capstone Member=Component C12 Cap
+Added Member To Class: ClassName=Capstone Member=Component C13 Cap
+Added Member To Class: ClassName=Capstone Member=Component C15 Cap
+Added Member To Class: ClassName=Capstone Member=Component C16 Cap
+Added Member To Class: ClassName=Capstone Member=Component C17 Cap
+Added Member To Class: ClassName=Capstone Member=Component P2 Reset
+Added Member To Class: ClassName=Capstone Member=Component R2 Res1
+Added Member To Class: ClassName=Capstone Member=Component R3 Res1
+Added Member To Class: ClassName=Capstone Member=Component R4 Res1
+Added Member To Class: ClassName=Capstone Member=Component R6 Res1
+Added Member To Class: ClassName=Capstone Member=Component R9 Res1
+Added Member To Class: ClassName=Capstone Member=Component S5 KSR222GLFS
+Added Member To Class: ClassName=Capstone Member=Component S6 PTS636_SK25J_SMTR_LFS
