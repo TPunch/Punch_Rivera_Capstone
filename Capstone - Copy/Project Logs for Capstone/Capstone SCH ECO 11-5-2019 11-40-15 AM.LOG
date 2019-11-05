@@ -1,0 +1,3 @@
+Change Component Comment: Designator=SWD Old Comment=Header 4 New Comment=Comment
+Change Component Comment: Designator=P2 Old Comment=Header 7 New Comment=Comment
+Add Pin To Net: Pin=R6-1 Old Net=VDD33 New Net=VDD_MCU
