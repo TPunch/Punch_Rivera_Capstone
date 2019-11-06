@@ -1,0 +1,77 @@
+Change Component Comment : Designator=D2 Old Comment=LED3 New Comment=GREEN_LED
+Change Component Designator: OldDesignator=Debug NewDesignator=Debug1
+Change Component Designator: OldDesignator=ESP SPI NewDesignator=ESP SPI1
+Change Component Designator: OldDesignator=MCU_CTS NewDesignator=MCU_CTS1
+Change Component Designator: OldDesignator=MCU_RTS NewDesignator=MCU_RTS1
+Change Component Designator: OldDesignator=S1 NewDesignator=RST
+Change Component Designator: OldDesignator=S2 NewDesignator=BOOT
+Change Component Designator: OldDesignator=S3 NewDesignator=EN_ESP
+Change Component Designator: OldDesignator=S5 NewDesignator=ADX_SHUTDOWN
+Change Component Designator: OldDesignator=S6 NewDesignator=EN_PS
+Change Component Designator: OldDesignator=SPI NewDesignator=SPI1
+Change Component Designator: OldDesignator=SWD NewDesignator=SWD1
+Change Component Designator: OldDesignator=UART NewDesignator=UART1
+Added Component: Designator=C18(RAD-0.3)
+Add component. Clean all parameters for all variants
+Add component (AddParameter): Name = "LatestRevisionDate"; Value = "17-Jul-2002"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "LatestRevisionNote"; Value = "Re-released for DXP Platform."; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "PackageDescription"; Value = "Radial Cap, Thru-Hole; 2 Leads; 0.3 in Pin Spacing"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "PackageReference"; Value = "RAD-0.3"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Published"; Value = "8-Jun-2000"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Publisher"; Value = "Altium Limited"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Value"; Value = "10uF"; VariantName = "[No Variations]"
+Added Component: Designator=C19(RAD-0.3)
+Add component. Clean all parameters for all variants
+Add component (AddParameter): Name = "LatestRevisionDate"; Value = "17-Jul-2002"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "LatestRevisionNote"; Value = "Re-released for DXP Platform."; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "PackageDescription"; Value = "Radial Cap, Thru-Hole; 2 Leads; 0.3 in Pin Spacing"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "PackageReference"; Value = "RAD-0.3"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Published"; Value = "8-Jun-2000"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Publisher"; Value = "Altium Limited"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Value"; Value = "10uF"; VariantName = "[No Variations]"
+Added Component: Designator=C20(RAD-0.3)
+Add component. Clean all parameters for all variants
+Add component (AddParameter): Name = "LatestRevisionDate"; Value = "17-Jul-2002"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "LatestRevisionNote"; Value = "Re-released for DXP Platform."; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "PackageDescription"; Value = "Radial Cap, Thru-Hole; 2 Leads; 0.3 in Pin Spacing"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "PackageReference"; Value = "RAD-0.3"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Published"; Value = "8-Jun-2000"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Publisher"; Value = "Altium Limited"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Value"; Value = "4.7uF"; VariantName = "[No Variations]"
+Added Pin To Net: NetName=GND Pin=C18-1
+Added Pin To Net: NetName=GND Pin=C19-1
+Added Pin To Net: NetName=GND Pin=C20-1
+Change Net Name : Old Net Name=NetR7_1 New Net Name=NetADX_SHUTDOWN_2
+Change Net Name : Old Net Name=NetR10_2 New Net Name=NetEN_PS_1
+Change Net Name : Old Net Name=NetS6_2 New Net Name=NetEN_PS_2
+Added Pin To Net: NetName=NetC18_2 Pin=C18-2
+Added Pin To Net: NetName=NetC18_2 Pin=C19-2
+Added Pin To Net: NetName=NetC18_2 Pin=C20-2
+Added Pin To Net: NetName=NetC18_2 Pin=P4-1
+Added Pin To Net: NetName=NetC18_2 Pin=U2-5
+Added Net: Name=NetC18_2
+Added Member To Class: ClassName=Capstone Member=Component ADX_SHUTDOWN KSR222GLFS
+Added Member To Class: ClassName=Capstone Member=Component C1 Cap
+Added Member To Class: ClassName=Capstone Member=Component C2 Cap
+Added Member To Class: ClassName=Capstone Member=Component C3 Cap
+Added Member To Class: ClassName=Capstone Member=Component C5 Cap
+Added Member To Class: ClassName=Capstone Member=Component C6 Cap
+Added Member To Class: ClassName=Capstone Member=Component C8 Cap
+Added Member To Class: ClassName=Capstone Member=Component C9 Cap
+Added Member To Class: ClassName=Capstone Member=Component C10 Cap
+Added Member To Class: ClassName=Capstone Member=Component C11 Cap
+Added Member To Class: ClassName=Capstone Member=Component C12 Cap
+Added Member To Class: ClassName=Capstone Member=Component C13 Cap
+Added Member To Class: ClassName=Capstone Member=Component C14 Cap
+Added Member To Class: ClassName=Capstone Member=Component C15 Cap
+Added Member To Class: ClassName=Capstone Member=Component C16 Cap
+Added Member To Class: ClassName=Capstone Member=Component C17 Cap
+Added Member To Class: ClassName=Capstone Member=Component C18 Cap
+Added Member To Class: ClassName=Capstone Member=Component C19 Cap
+Added Member To Class: ClassName=Capstone Member=Component C20 Cap
+Added Member To Class: ClassName=Capstone Member=Component P2 Reset
+Added Member To Class: ClassName=Capstone Member=Component R2 Res1
+Added Member To Class: ClassName=Capstone Member=Component R3 Res1
+Added Member To Class: ClassName=Capstone Member=Component R4 Res1
+Added Member To Class: ClassName=Capstone Member=Component R6 Res1
+Added Member To Class: ClassName=Capstone Member=Component R9 Res1

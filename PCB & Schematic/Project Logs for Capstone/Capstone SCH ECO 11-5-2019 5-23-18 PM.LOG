@@ -1,0 +1,16 @@
+Change Component Footprint: Designator=D1 Old Footprint=3.2X1.6X1.1 New Footprint=0402
+Change Component Footprint: Designator=D2 Old Footprint=3.5X2.8X1.9 New Footprint=0402
+Change Component Footprint: Designator=R8 Old Footprint=AXIAL-0.3 New Footprint=6-0805_N
+Change Component Footprint: Designator=R9 Old Footprint=AXIAL-0.3 New Footprint=6-0805_N
+Change Component Footprint: Designator=R10 Old Footprint=AXIAL-0.3 New Footprint=6-0805_N
+Change Component Footprint: Designator=C18 Old Footprint=RAD-0.3 New Footprint=0402
+Change Component Footprint: Designator=C19 Old Footprint=RAD-0.3 New Footprint=0402
+Change Component Footprint: Designator=C20 Old Footprint=RAD-0.3 New Footprint=0402
+Change Component Footprint: Designator=C17 Old Footprint=RAD-0.3 New Footprint=*CAPC2012X88N
+Change Component Designator: OldDesignator=Debug1 NewDesignator=Debug
+Change Component Designator: OldDesignator=ESP SPI1 NewDesignator=ESP SPI
+Change Component Designator: OldDesignator=MCU_CTS1 NewDesignator=MCU_CTS
+Change Component Designator: OldDesignator=MCU_RTS1 NewDesignator=MCU_RTS
+Change Component Designator: OldDesignator=SPI1 NewDesignator=SPI
+Change Component Designator: OldDesignator=SWD1 NewDesignator=SWD
+Change Component Designator: OldDesignator=UART1 NewDesignator=UART

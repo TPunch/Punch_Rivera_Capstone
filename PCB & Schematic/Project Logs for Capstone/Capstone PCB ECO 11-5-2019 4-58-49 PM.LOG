@@ -1,0 +1,29 @@
+Added Component: Designator=NRST/I2C(HDR1X3)
+Add component. Clean all parameters for all variants
+Add component (AddParameter): Name = "LatestRevisionDate"; Value = "17-Jul-2002"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "LatestRevisionNote"; Value = "Re-released for DXP Platform."; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Publisher"; Value = "Altium Limited"; VariantName = "[No Variations]"
+Added Component: Designator=R11(AXIAL-0.3)
+Add component. Clean all parameters for all variants
+Add component (AddParameter): Name = "LatestRevisionDate"; Value = "17-Jul-2002"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "LatestRevisionNote"; Value = "Re-released for DXP Platform."; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "PackageDescription"; Value = "Axial Device, Thru-Hole; 2 Leads; 0.3 in Pin Spacing"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "PackageReference"; Value = "AXIAL-0.3"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Published"; Value = "8-Jun-2000"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Publisher"; Value = "Altium Limited"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Value"; Value = "10K"; VariantName = "[No Variations]"
+Added Pin To Net: NetName=NetC13_2 Pin=IC1-7
+Added Pin To Net: NetName=NetC13_2 Pin=NRST/I2C-1
+Added Pin To Net: NetName=GND Pin=R11-2
+Added Pin To Net: NetName=I2C1_SCL Pin=IC1-61
+Added Pin To Net: NetName=I2C1_SCL Pin=NRST/I2C-3
+Added Net: Name=I2C1_SCL
+Added Pin To Net: NetName=I2C1_SDA Pin=IC1-62
+Added Pin To Net: NetName=I2C1_SDA Pin=NRST/I2C-2
+Added Net: Name=I2C1_SDA
+Added Pin To Net: NetName=PH3-BOOT0 Pin=IC1-60
+Added Pin To Net: NetName=PH3-BOOT0 Pin=R11-1
+Added Net: Name=PH3-BOOT0
+Added Member To Class: ClassName=Capstone Member=Component NRST/I2C Header 3
+Added Member To Class: ClassName=Capstone Member=Component NRST KSR222GLFS
+Added Member To Class: ClassName=Capstone Member=Component R11 Res1
