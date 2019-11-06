@@ -1,0 +1,14 @@
+Remove Pin=R1-1 From Net=VDD33
+Remove Pin=R5-2 From Net=VDD33
+Remove Pin=SWD-2 From Net=VDD33
+Change Component Footprint: Designator=R11 Old Footprint=AXIAL-0.3 New Footprint=6-0805_N
+Change Component Footprint: Designator=RADX Old Footprint=AXIAL-0.3 New Footprint=6-0805_N
+Change Component Footprint: Designator=RESP Old Footprint=AXIAL-0.3 New Footprint=6-0805_N
+Change Component Footprint: Designator=RMCU Old Footprint=AXIAL-0.3 New Footprint=6-0805_N
+Change Component Footprint: Designator=D3 Old Footprint=SMB New Footprint=SD0805
+Change Component Comment: Designator=D3 Old Comment=D Schottky New Comment=RED_LED
+Change Component Designator: OldDesignator=P3 NewDesignator=MCU DBG
+Add Pin To Net: Pin=R1-1 Old Net=VDD33 New Net=VDD_MCU
+Add Pin To Net: Pin=R5-2 Old Net=VDD33 New Net=VDD_MCU
+Add Pin To Net: Pin=SWD-2 Old Net=VDD33 New Net=VDD_MCU
+Add Pin To Net: Pin=U2-4 Old Net=NetU2_4 New Net=GND

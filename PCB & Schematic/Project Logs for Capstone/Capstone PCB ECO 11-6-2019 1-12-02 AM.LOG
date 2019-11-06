@@ -1,0 +1,16 @@
+Removed Pin From Net: NetName=ADXL362_MOSI Pin=ADXL362 SPI-4
+Removed Pin From Net: NetName=VDD33 Pin=C5-2
+Removed Pin From Net: NetName=VDD33 Pin=C6-2
+Removed Pin From Net: NetName=VDD33 Pin=C7-2
+Removed Pin From Net: NetName=VDD33 Pin=C8-2
+Removed Pin From Net: NetName=VDD33 Pin=C9-2
+Removed Pin From Net: NetName=VDD33 Pin=C10-2
+Added Pin To Net: NetName=VDD_MCU Pin=C5-2
+Added Pin To Net: NetName=VDD_MCU Pin=C6-2
+Added Pin To Net: NetName=VDD_MCU Pin=C7-2
+Added Pin To Net: NetName=VDD_MCU Pin=C8-2
+Added Pin To Net: NetName=VDD_MCU Pin=C9-2
+Added Pin To Net: NetName=VDD_MCU Pin=C10-2
+Added Pin To Net: NetName=NetADXL362 SPI_4 Pin=ADXL362 SPI-4
+Added Net: Name=NetADXL362 SPI_4
+Added Member To Class: ClassName=Capstone Member=Component D1 RED_LED
