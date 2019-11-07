@@ -1,0 +1,14 @@
+Removed Pin From Net: NetName=NetD1_1 Pin=EN PS-2
+Change Component Footprint: Designator=EN PS Old Footprint=PTS636SK25JSMTRLFS New Footprint=GT11MSCBE
+Change Component Comment : Designator=EN PS Old Comment=PTS636_SK25J_SMTR_LFS New Comment=GT12MSCBETR
+Change component parameters: Designator = "EN PS"; Footprint = "GT11MSCBE"; UniqueID = "\SLHUZQGG"
+Change component parameters. Clean all parameters for all variants
+Change component parameters (AddParameter): Name = "Datasheet Link"; Value = "https://componentsearchengine.com/Datasheets/1/GT12MSCBETR.pdf"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Manufacturer_Name"; Value = "C & K COMPONENTS"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Manufacturer_Part_Number"; Value = "GT12MSCBETR"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Mouser Part Number"; Value = "611-GT12MSCBETR"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Mouser Price/Stock"; Value = "https://www.mouser.com/Search/Refine.aspx?Keyword=611-GT12MSCBETR"; VariantName = "[No Variations]"
+Added Pin To Net: NetName=NetD1_1 Pin=EN PS-1
+Added Pin To Net: NetName=NetEN PS_3 Pin=EN PS-3
+Added Pin To Net: NetName=NetEN PS_3 Pin=R10-2
+Added Net: Name=NetEN PS_3

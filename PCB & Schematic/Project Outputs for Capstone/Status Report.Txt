@@ -1,0 +1,25 @@
+Output: Gerber Files
+Type  : Gerber
+From  : Variant [[No Variations]] of Project [Capstone.PrjPcb]
+   Generated File[Capstone.GTO]
+   Generated File[Capstone.GTP]
+   Generated File[Capstone.GTS]
+   Generated File[Capstone.GTL]
+   Generated File[Capstone.GBL]
+   Generated File[Capstone.GBS]
+   Generated File[Capstone.GBP]
+   Generated File[Capstone.GBO]
+   Generated File[Capstone.GKO]
+   Generated File[Capstone.GPT]
+   Generated File[Capstone.GPB]
+   Generated File[Capstone.GD1]
+   Generated File[Capstone.GG1]
+   Generated File[Capstone.RUL]
+   Generated File[Capstone.EXTREP]
+   Generated File[Capstone.REP]
+
+
+Files Generated   : 16
+Documents Printed : 0
+
+Finished Output Generation At 8:25:18 AM On 11/7/2019
