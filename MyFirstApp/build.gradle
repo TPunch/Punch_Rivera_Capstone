@@ -3,11 +3,14 @@
 buildscript {
     ext.kotlin_version = '1.3.50'
     repositories {
-        google()
+        google() // Google's Maven Repository
         jcenter()
         
     }
     dependencies {
+        // Add google services plugin to read the config file
+        classpath 'com.google.gms:google-services:4.3.2'
+
         classpath 'com.android.tools.build:gradle:3.5.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         // NOTE: Do not place your application dependencies here; they belong
@@ -17,7 +20,7 @@ buildscript {
 
 allprojects {
     repositories {
-        google()
+        google() // Google's Maven Repository
         jcenter()
         
     }
