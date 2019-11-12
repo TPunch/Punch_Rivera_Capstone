@@ -8,8 +8,8 @@
 #endif
 
 #ifndef FIREBASE_HOST
-#define FIREBASE_HOST "garage-door-warning-system.firebaseio.com" 
-#define FIREBASE_AUTH "gjUugc8Gz1UTi84SawRhHaVwfn5B33GzJqAdNj04" 
+#define FIREBASE_HOST "androidtest-2aab5.firebaseio.com" 
+#define FIREBASE_AUTH "AIzaSyAh-bNTSRzxib8yWfCd8QyQ7fxIywo1DXE" 
 #endif
 
 const char *ssid = STASSID;

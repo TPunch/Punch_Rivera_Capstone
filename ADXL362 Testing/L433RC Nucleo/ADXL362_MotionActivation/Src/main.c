@@ -144,10 +144,24 @@ int main(void)
 	  ADXL362_AFlag = HAL_GPIO_ReadPin(ADXL362_INT1_GPIO_Port, ADXL362_INT1_Pin);
 
 	  if (ADXL362_AFlag == 0){
-		  sprintf(message, "\r\nADXL362 is sleeping. MCU is going night night!\r\n");
+		  sprintf(message, "ADXL362 is sleeping. MCU is going night night!\r\n");
 		  HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), 0xFFFF);
+		  ADXL362_GetXYZT(&x12, &y12, &z12, &temp12);
+		  xyzt[0] = (0.001 * x12) + X_OFFSET;
+		  xyzt[1] = (0.001 * y12) + Y_OFFSET;
+		  xyzt[2] = (0.001 * z12) + Z_OFFSET;
+		  xyzt[3] = (0.065 * temp12) + TEMP_OFFSET;
+		  xAng = atan2(xyzt[0], sqrt(pow(xyzt[1],2) + pow(xyzt[2], 2)));
+		  xAng *= 180/M_PI;
+		  yAng = atan2(xyzt[1], sqrt(pow(xyzt[0],2) + pow(xyzt[2], 2)));
+		  yAng *= 180/M_PI;
+		  zAng = atan2(sqrt(pow(xyzt[0], 2) + pow(xyzt[1], 2)), xyzt[2]);
+		  zAng *= 180/M_PI;
+		  sprintf(message, "X%+lf Y%+lf Z%+lf T%+lf \r\n", xAng, yAng, zAng, xyzt[3]);
+		  HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), 0xFFFF);
+		  HAL_UART_Transmit(&huart1, (uint8_t*)message, strlen(message), 0xFFFF);
 		  HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_RESET);
-		  HAL_Delay(100);
+		  HAL_Delay(200);
 		  HAL_SuspendTick();
 		  HAL_PWR_EnterSLEEPMode(PWR_LOWPOWERREGULATOR_ON, PWR_SLEEPENTRY_WFI);
 		  HAL_ResumeTick();
@@ -158,13 +172,14 @@ int main(void)
 		  xyzt[data_counter++] = (0.001 * y12) + Y_OFFSET;
 		  xyzt[data_counter++] = (0.001 * z12) + Z_OFFSET;
 		  xyzt[data_counter++] = (0.065 * temp12) + TEMP_OFFSET;
-		  //xAng[data_counter]
-		  //data_counter++;
 		  if(data_counter == 400){
-			  xAng = atan(xyzt[data_counter-4] / sqrt((xyzt[data_counter-3] * xyzt[data_counter-3]) + (xyzt[data_counter-2] * xyzt[data_counter-2]))) * 57.2957795+180;
-			  yAng = atan(xyzt[data_counter-3] / sqrt((xyzt[data_counter-4] * xyzt[data_counter-4]) + (xyzt[data_counter-2] * xyzt[data_counter-2]))) * 57.2957795+180;
-			  zAng = atan(sqrt((xyzt[data_counter-4] * xyzt[data_counter-4]) + (xyzt[data_counter-3] * xyzt[data_counter-3])) / xyzt[data_counter-2]) * 57.2957795+180;
-			  sprintf(message, " X%+lf Y%+lf Z%lf T%+lf \r\n", xAng, yAng, zAng, xyzt[data_counter-1]);
+			  xAng = atan2(xyzt[data_counter-4], sqrt(pow(xyzt[data_counter-3],2) + pow(xyzt[data_counter-2], 2)));
+			  xAng *= 180/M_PI;
+			  yAng = atan2(xyzt[data_counter-3], sqrt(pow(xyzt[data_counter-4],2) + pow(xyzt[data_counter-2], 2)));
+			  yAng *= 180/M_PI;
+			  zAng = atan2(sqrt(pow(xyzt[data_counter-4], 2) + pow(xyzt[data_counter-3], 2)), xyzt[data_counter-2]);
+			  zAng *= 180/M_PI;
+			  sprintf(message, " X%+lf Y%+lf Z%+lf T%+lf \r\n", xAng, yAng, zAng, xyzt[data_counter-1]);
 			  HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), 0xFFFF);
 			  HAL_UART_Transmit(&huart1, (uint8_t*)message, strlen(message), 0xFFFF);
 			  data_counter = 0;
