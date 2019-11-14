@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "851343566857",
+    "firebase_url": "https://garage-door-warning-system.firebaseio.com",
+    "project_id": "garage-door-warning-system",
+    "storage_bucket": "garage-door-warning-system.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:851343566857:android:8c21966e937a141912b0d8",
+        "android_client_info": {
+          "package_name": "com.example.gdwsapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "851343566857-a0pq32o3c1vuqi3j7ns8uco8cnkplp0l.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.gdwsapp",
+            "certificate_hash": "bf4d7ceb8b57a3eaf15729eb850c7c3471371054"
+          }
+        },
+        {
+          "client_id": "851343566857-r5l538c64nubgum67205a7edit3gpnh5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB0w0ObvkkMYRnr2hSY3gzNVZkHTdY-tUA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "851343566857-r5l538c64nubgum67205a7edit3gpnh5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
