@@ -4,6 +4,8 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "string.h"
+
+#include "math.h"
 #include "main.h"
 
 // ADXL362 Registers
@@ -49,10 +51,10 @@
 #define Z_OFFSET		0.145
 #define TEMP_OFFSET		-17
 // ADXL362 USER Defined Constants
-#define USER_ACT_TIME		100		// 1 seconds
-#define USER_ACT_THRESH		350		// 350 mg
-#define USER_INACT_TIME		360		// 5 seconds
-#define USER_INACT_THRESH	300		// 300 mg
+#define USER_ACT_TIME		50		// 1 seconds
+#define USER_ACT_THRESH		50		// 350 mg
+#define USER_INACT_TIME		50		// 5 seconds
+#define USER_INACT_THRESH	50		// 300 mg
 
 /* Function prototypes -----------------------------------------------*/
 uint8_t ADXL362_ReadReg(uint8_t address);
@@ -63,5 +65,4 @@ void ADXL362_GetXYZT(int16_t *x, int16_t *y, int16_t *z, int16_t *temp);
 void ADXL362_Init(void);
 void ADXL362_ActivityInit (uint16_t thresh, uint8_t timer);
 void ADXL362_InactivityInit (uint16_t thresh, uint16_t timer);
-
 #endif /* INCLUDE_ADXL362_H_ */

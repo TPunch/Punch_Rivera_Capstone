@@ -23,7 +23,6 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "math.h"
 #include "ADXL362.h"
 /* USER CODE END Includes */
 
@@ -57,9 +56,12 @@ DMA_HandleTypeDef hdma_usart2_tx;
 /* USER CODE BEGIN PV */
 int8_t x8 = 0, y8 = 0, z8 = 0;
 int16_t x12 = 0, y12 = 0, z12 = 0, temp12 = 0;
-volatile uint32_t drFlag, data_counter = 0, dataTxReady, GarageState, ADXL362_AFlag;
-double xyzt[400], xAng, yAng, zAng;
-char message[200], data[200];
+volatile int16_t GarageState;
+volatile uint32_t drFlag, data_counter = 0, ADXL362_AFlag;
+double xyzt[400];
+double xAng, yAng, zAng, tempF;
+double xThresh, yThresh, zThresh;
+char message[200];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -70,23 +72,17 @@ static void MX_SPI2_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
-void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi);
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi)
-{
-	if(hspi->Instance==SPI2)
-	{
-	}
-}
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 	if(GPIO_Pin == ADXL362_INT1_Pin)
 	{
+		// Display MCU waking up
 		sprintf(message, "\r\nMCU has arisen from its slumber!\r\n");
 		HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), 0xFFFF);
 
@@ -133,7 +129,32 @@ int main(void)
   MX_USART2_UART_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
+
+  // Initialize ADXL362
   ADXL362_Init();
+
+  ADXL362_GetXYZT(&x12, &y12, &z12, &temp12);		// Get X,Y,Z acceleration as ADC values for initial threshold values
+
+  // Process XYZT values to g's (acceleration due to gravity) 1mg = 1LSB
+  xyzt[0] = (0.001 * (double)x12) + X_OFFSET;				// Offsets are due to using a supply voltage of ~3.3VDC
+  xyzt[1] = (0.001 * (double)y12) + Y_OFFSET;				// Offsets were adjusted primarily from the datasheet
+  xyzt[2] = (0.001 * (double)z12) + Z_OFFSET;				// then manually after
+  xyzt[3] = (0.065 * (double)temp12) + TEMP_OFFSET;			// 0.065 degrees C = 1LSB
+
+  // Process g's to angles x-axis angle(Rho), y-axis angle(Phi), and z-axis angle(Theta)
+  xThresh = atan2(xyzt[0], sqrt(pow(xyzt[1],2) + pow(xyzt[2], 2)));
+  xThresh *= 180/M_PI;
+  yThresh = atan2(xyzt[1], sqrt(pow(xyzt[0],2) + pow(xyzt[2], 2)));
+  yThresh *= 180/M_PI;
+  zThresh = atan2(sqrt(pow(xyzt[0], 2) + pow(xyzt[1], 2)), xyzt[2]);
+  zThresh *= 180/M_PI;
+  zThresh -= 90;
+
+  // Display & transmit current threshold angles
+  sprintf(message, "\r\nxT:%+lf yT:%+lf zT:%+lf\r\n", xThresh, yThresh, zThresh);
+  HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), 0xFFFF);
+  HAL_UART_Transmit(&huart1, (uint8_t*)message, strlen(message), 0xFFFF);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -143,49 +164,79 @@ int main(void)
 	  // Check ADXL362 Awake interrupt to determine
 	  ADXL362_AFlag = HAL_GPIO_ReadPin(ADXL362_INT1_GPIO_Port, ADXL362_INT1_Pin);
 
-	  if (ADXL362_AFlag == 0){
-		  sprintf(message, "ADXL362 is sleeping. MCU is going night night!\r\n");
-		  HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), 0xFFFF);
-		  ADXL362_GetXYZT(&x12, &y12, &z12, &temp12);
-		  xyzt[0] = (0.001 * x12) + X_OFFSET;
-		  xyzt[1] = (0.001 * y12) + Y_OFFSET;
-		  xyzt[2] = (0.001 * z12) + Z_OFFSET;
-		  xyzt[3] = (0.065 * temp12) + TEMP_OFFSET;
+	  if (ADXL362_AFlag == 0){			// If the device is not moving
+
+		  ADXL362_GetXYZT(&x12, &y12, &z12, &temp12);		// Get X,Y,Z acceleration and temperature as ADC values
+
+		  // Process XYZT values to g's (acceleration due to gravity) 1mg = 1LSB
+		  xyzt[0] = (0.001 * (double)x12) + X_OFFSET;				// Offsets are due to using a supply voltage of ~3.3VDC
+		  xyzt[1] = (0.001 * (double)y12) + Y_OFFSET;				// Offsets were adjusted primarily from the datasheet
+		  xyzt[2] = (0.001 * (double)z12) + Z_OFFSET;				// then manually after
+		  xyzt[3] = (0.065 * (double)temp12) + TEMP_OFFSET;			// 0.065 degrees C = 1LSB
+
+		  // Process g's to angles x-axis angle(Rho), y-axis angle(Phi), and z-axis angle(Theta)
 		  xAng = atan2(xyzt[0], sqrt(pow(xyzt[1],2) + pow(xyzt[2], 2)));
 		  xAng *= 180/M_PI;
 		  yAng = atan2(xyzt[1], sqrt(pow(xyzt[0],2) + pow(xyzt[2], 2)));
 		  yAng *= 180/M_PI;
 		  zAng = atan2(sqrt(pow(xyzt[0], 2) + pow(xyzt[1], 2)), xyzt[2]);
 		  zAng *= 180/M_PI;
-		  sprintf(message, "X%+lf Y%+lf Z%+lf T%+lf \r\n", xAng, yAng, zAng, xyzt[3]);
+		  zAng -= 90;
+
+		  // Convert degrees C to degrees F
+		  tempF = (xyzt[3] * (9.0/5.0)) + 32;
+
+		  // Determine garage door state by comparing threshold and current angles
+		  if((abs((int)(xThresh - xAng)) > 10) || (abs((int)(yThresh - yAng)) > 10) || (abs((int)(zThresh - zAng)) > 10)){
+			  HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET);
+			  GarageState = 1;
+		  } else{
+			  HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_RESET);
+			  GarageState = 0;
+		  }
+
+		  // Display & transmit final garage door data before sleeping
+		  sprintf(message, " X%+lf Y%+lf Z%+lf T%+lf S%d \r\n", xAng, yAng, zAng, tempF, GarageState);
 		  HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), 0xFFFF);
 		  HAL_UART_Transmit(&huart1, (uint8_t*)message, strlen(message), 0xFFFF);
-		  HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_RESET);
+
+		  // Display MCU going to sleep
+		  sprintf(message, "ADXL362 is sleeping. MCU is going night night!\r\n");
+		  HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), 0xFFFF);
 		  HAL_Delay(200);
 		  HAL_SuspendTick();
 		  HAL_PWR_EnterSLEEPMode(PWR_LOWPOWERREGULATOR_ON, PWR_SLEEPENTRY_WFI);
 		  HAL_ResumeTick();
 	  } else{
-		  HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET);
-		  ADXL362_GetXYZT(&x12, &y12, &z12, &temp12);
-		  xyzt[data_counter++] = (0.001 * x12) + X_OFFSET;
-		  xyzt[data_counter++] = (0.001 * y12) + Y_OFFSET;
-		  xyzt[data_counter++] = (0.001 * z12) + Z_OFFSET;
-		  xyzt[data_counter++] = (0.065 * temp12) + TEMP_OFFSET;
-		  if(data_counter == 400){
-			  xAng = atan2(xyzt[data_counter-4], sqrt(pow(xyzt[data_counter-3],2) + pow(xyzt[data_counter-2], 2)));
+		  ADXL362_GetXYZT(&x12, &y12, &z12, &temp12);		// Get X,Y,Z acceleration and temperature as ADC values
+		  data_counter += 4;				// Increment data_counter
+		  if(data_counter == 396){			// Calculate every 100th dataset and display
+			  // Process XYZT values to g's (acceleration due to gravity) 1mg = 1LSB
+			  xyzt[data_counter] = (0.001 * (double)x12) + X_OFFSET;				// Offsets are due to using a supply voltage of ~3.3VDC
+			  xyzt[data_counter+1] = (0.001 * (double)y12) + Y_OFFSET;				// Offsets were adjusted primarily from the datasheet
+			  xyzt[data_counter+2] = (0.001 * (double)z12) + Z_OFFSET;				// then manually after
+			  xyzt[data_counter+3] = (0.065 * (double)temp12) + TEMP_OFFSET;		// 0.065 degrees C = 1LSB
+
+			  // Process g's to angles x-axis angle(Rho), y-axis angle(Phi), and z-axis angle(Theta)
+			  xAng = atan2(xyzt[0], sqrt(pow(xyzt[1],2) + pow(xyzt[2], 2)));
 			  xAng *= 180/M_PI;
-			  yAng = atan2(xyzt[data_counter-3], sqrt(pow(xyzt[data_counter-4],2) + pow(xyzt[data_counter-2], 2)));
+			  yAng = atan2(xyzt[1], sqrt(pow(xyzt[0],2) + pow(xyzt[2], 2)));
 			  yAng *= 180/M_PI;
-			  zAng = atan2(sqrt(pow(xyzt[data_counter-4], 2) + pow(xyzt[data_counter-3], 2)), xyzt[data_counter-2]);
+			  zAng = atan2(sqrt(pow(xyzt[0], 2) + pow(xyzt[1], 2)), xyzt[2]);
 			  zAng *= 180/M_PI;
-			  sprintf(message, " X%+lf Y%+lf Z%+lf T%+lf \r\n", xAng, yAng, zAng, xyzt[data_counter-1]);
+			  zAng -= 90;
+
+			  // Convert degrees C to degrees F
+			  tempF = (xyzt[3] * (9.0/5.0)) + 32;
+
+			  // Display & transmit garage door data
+			  sprintf(message, " X%+lf Y%+lf Z%+lf T%+lf S%d \r\n", xAng, yAng, zAng, tempF, GarageState);
 			  HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), 0xFFFF);
 			  HAL_UART_Transmit(&huart1, (uint8_t*)message, strlen(message), 0xFFFF);
-			  data_counter = 0;
+			  data_counter = 0;			// Reset data_counter
 		  }
 	  }
-	  HAL_Delay(5);
+	  HAL_Delay(10);
 
     /* USER CODE END WHILE */
 

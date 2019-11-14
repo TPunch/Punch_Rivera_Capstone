@@ -1,3 +1,4 @@
+
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <FirebaseESP8266.h>
@@ -8,15 +9,14 @@
 #endif
 
 #ifndef FIREBASE_HOST
-#define FIREBASE_HOST "androidtest-2aab5.firebaseio.com" 
-#define FIREBASE_AUTH "AIzaSyAh-bNTSRzxib8yWfCd8QyQ7fxIywo1DXE" 
+#define FIREBASE_HOST "garage-door-warning-system.firebaseio.com" 
+#define FIREBASE_AUTH "gjUugc8Gz1UTi84SawRhHaVwfn5B33GzJqAdNj04" 
 #endif
 
 const char *ssid = STASSID;
 const char *password = STAPSK;
 
 FirebaseData firebaseData;
-FirebaseJson jsonBuffer;
 
 const int led = 14;
 
@@ -34,6 +34,8 @@ void setup(void) {
     delay(500);
     Serial.print(".");
   }
+  Serial.print("MAC: ");
+  Serial.println(WiFi.macAddress());
 
   digitalWrite(led, 1);
   Serial.println("");
@@ -55,13 +57,14 @@ void setup(void) {
 }
 
 void loop(void) {
-  char temp[400], sign;
+  char temp[400], sign, s;
   int sec = millis() / 1000;
   int min = sec / 60;
   int hr = min / 60;
+  int GarageState = 0;
   double x = 0, y = 0, z = 0, t = 0;
   boolean dataReady = false;
-  String jsonStr, rxString, data;
+  String rxString, data;
 
   while (dataReady == false)
     if (Serial.available()) {
@@ -117,6 +120,18 @@ void loop(void) {
           }
           Serial.println(t);
           Serial.println();
+        }
+        if(rxString.indexOf("S") >=0) {
+          Serial.print("Garage State: ");
+          if (rxString == "S1"){
+            Serial.println("Open");
+            GarageState = 1;
+          } else{
+              Serial.println("Closed");
+              GarageState = 0;
+          }
+          Serial.println(GarageState);
+          Serial.println();
           dataReady = true;
         }
         rxString = ""; //clears variable for new input
@@ -126,15 +141,11 @@ void loop(void) {
         rxString += c; // Continue reading the string
       }
     }
-
-  //String fireX = String(x) + String("%");
-  //String fireY = String(y) + String("%");
-  //String fireZ = String(z) + String("%");
-  //String fireTemp = String(t) + String("%");
-  Firebase.pushDouble(firebaseData, "ADXL362/X", x);
-  Firebase.pushDouble(firebaseData, "ADXL362/Y", y);
-  Firebase.pushDouble(firebaseData, "ADXL362/Z", z);
-  Firebase.pushDouble(firebaseData, "ADXL362/T", t);
-  Firebase.pushTimestamp(firebaseData, "ADXL362/Time");
+  Firebase.setDouble(firebaseData, "/ADXL362/XAng", x);
+  Firebase.setDouble(firebaseData, "/ADXL362/YAng", y);
+  Firebase.setDouble(firebaseData, "/ADXL362/ZAng", z);
+  Firebase.setDouble(firebaseData, "/ADXL362/Temp", t);
+  Firebase.setInt(firebaseData, "/ADXL362/GarageState", GarageState);
+  Firebase.setTimestamp(firebaseData, "/ADXL362/Time");
 
 }
