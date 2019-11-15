@@ -1,4 +1,12 @@
 <resources>
     <string name="app_name">GDWSApp</string>
-    <string name="temp">Temp</string>
+    <string name="temp"> Temp</string>
+    <string name="temperature">Temperature: </string>
+    <string name="xang">X Angle: </string>
+    <string name="x">X</string>
+    <string name="yang">Y Angle: </string>
+    <string name="y">Y</string>
+    <string name="zang">Z Angle: </string>
+    <string name="z">Z</string>
+    <string name="time">Time: </string>
 </resources>

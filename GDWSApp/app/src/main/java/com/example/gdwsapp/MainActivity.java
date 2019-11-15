@@ -15,10 +15,16 @@ import com.google.firebase.database.ValueEventListener;
 public class MainActivity extends AppCompatActivity {
 
     TextView mTempTextView;
+    TextView mXTextView;
+    TextView mYTextView;
+    TextView mZTextView;
 
     // Gets reference to the root of Firebase JSON tree
     DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
     DatabaseReference mTempRef = mRootRef.child("ADXL362").child("Temp");
+    DatabaseReference mXRef = mRootRef.child("ADXL362").child("XAng");
+    DatabaseReference mYRef = mRootRef.child("ADXL362").child("YAng");
+    DatabaseReference mZRef = mRootRef.child("ADXL362").child("ZAng");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +33,10 @@ public class MainActivity extends AppCompatActivity {
 
         // Get UI elements
         mTempTextView = findViewById(R.id.textViewTemp);
+        mXTextView = findViewById(R.id.textViewX);
+        mYTextView = findViewById(R.id.textViewY);
+        mZTextView = findViewById(R.id.textViewZ);
+
     }
 
     @Override
@@ -36,8 +46,44 @@ public class MainActivity extends AppCompatActivity {
         mTempRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                double text = dataSnapshot.getValue(double.class);
-                mTempTextView.setText(String.valueOf(text));
+                double tempVal = dataSnapshot.getValue(double.class);
+                mTempTextView.setText(String.valueOf(tempVal));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+        mXRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                double xVal = dataSnapshot.getValue(double.class);
+                mXTextView.setText(String.valueOf(xVal));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+        mYRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                double yVal = dataSnapshot.getValue(double.class);
+                mYTextView.setText(String.valueOf(yVal));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+        mZRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                double zVal = dataSnapshot.getValue(double.class);
+                mZTextView.setText(String.valueOf(zVal));
             }
 
             @Override

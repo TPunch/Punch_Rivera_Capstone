@@ -1,19 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".MainActivity">
-
-    <TextView
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/temp"
-        android:id="@+id/textViewTemp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:orientation="vertical">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <!-- Temperature Block -->
+        <TextView
+            android:id="@+id/tempText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@id/tempText"
+            android:layout_alignLeft="@id/tempText"
+            android:text="@string/temperature" />
+
+        <TextView
+            android:id="@+id/textViewTemp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:textAlignment="gravity"
+            android:text="@string/temp" />
+
+        <!-- X Angle Block -->
+        <TextView
+            android:id="@+id/xangText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/xang"
+            android:gravity="start"
+            android:textAlignment="gravity"
+            android:layout_below="@id/textViewTemp"/>
+
+        <TextView
+            android:id="@+id/textViewX"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/x"
+            android:gravity="end"
+            android:textAlignment="gravity"
+            android:layout_toEndOf="@id/xangText"
+            android:layout_toRightOf="@id/xangText"
+            android:layout_below="@id/tempText"/>
+
+        <!-- Y Angle Block -->
+        <TextView
+            android:id="@+id/yangText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/yang"
+            android:gravity="start"
+            android:textAlignment="gravity"
+            android:layout_below="@id/xangText"/>
+
+        <TextView
+            android:id="@+id/textViewY"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/y"
+            android:gravity="end"
+            android:textAlignment="gravity"
+            android:layout_toEndOf="@id/yangText"
+            android:layout_toRightOf="@id/yangText"
+            android:layout_below="@id/textViewX"/>
+
+        <!-- Z Angle Block -->
+        <TextView
+            android:id="@+id/zangText"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/zang"
+            android:gravity="start"
+            android:textAlignment="gravity"
+            android:layout_below="@id/yangText"/>
+
+        <TextView
+            android:id="@+id/textViewZ"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/z"
+            android:gravity="end"
+            android:textAlignment="gravity"
+            android:layout_toEndOf="@id/zangText"
+            android:layout_toRightOf="@id/zangText"
+            android:layout_below="@id/textViewY"/>
+
+    </RelativeLayout>
+</ScrollView>
