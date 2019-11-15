@@ -11,9 +11,12 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import java.util.*;
+import java.text.*;
 
 public class MainActivity extends AppCompatActivity {
 
+    TextView mTimeTextView;
     TextView mTempTextView;
     TextView mXTextView;
     TextView mYTextView;
@@ -21,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
 
     // Gets reference to the root of Firebase JSON tree
     DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
+    DatabaseReference mTimeRef = mRootRef.child("ADXL362").child("Time");
     DatabaseReference mTempRef = mRootRef.child("ADXL362").child("Temp");
     DatabaseReference mXRef = mRootRef.child("ADXL362").child("XAng");
     DatabaseReference mYRef = mRootRef.child("ADXL362").child("YAng");
@@ -32,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // Get UI elements
+        mTimeTextView = findViewById(R.id.textViewTime);
         mTempTextView = findViewById(R.id.textViewTemp);
         mXTextView = findViewById(R.id.textViewX);
         mYTextView = findViewById(R.id.textViewY);
@@ -42,6 +47,22 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+
+        mTimeRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                double timeVal = dataSnapshot.getValue(double.class);
+                Date date = new Date((long)timeVal);
+                DateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+                String formatted = format.format(date);
+                mTimeTextView.setText(formatted);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
         mTempRef.addValueEventListener(new ValueEventListener() {
             @Override

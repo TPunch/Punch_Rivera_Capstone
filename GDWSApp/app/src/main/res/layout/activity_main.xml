@@ -10,6 +10,23 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <!-- Time Block -->
+        <TextView
+            android:id="@+id/timeText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@id/timeText"
+            android:layout_alignLeft="@id/timeText"
+            android:text="@string/timestamp" />
+
+        <TextView
+            android:id="@+id/textViewTime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:textAlignment="gravity"
+            android:hint="@string/time" />
+
         <!-- Temperature Block -->
         <TextView
             android:id="@+id/tempText"
@@ -17,7 +34,8 @@
             android:layout_height="wrap_content"
             android:layout_alignStart="@id/tempText"
             android:layout_alignLeft="@id/tempText"
-            android:text="@string/temperature" />
+            android:text="@string/temperature"
+            android:layout_below="@id/timeText"/>
 
         <TextView
             android:id="@+id/textViewTemp"
@@ -25,7 +43,8 @@
             android:layout_height="wrap_content"
             android:gravity="end"
             android:textAlignment="gravity"
-            android:text="@string/temp" />
+            android:hint="@string/temp"
+            android:layout_below="@id/textViewTime"/>
 
         <!-- X Angle Block -->
         <TextView

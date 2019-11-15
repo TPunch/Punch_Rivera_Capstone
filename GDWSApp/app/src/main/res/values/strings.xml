@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">GDWSApp</string>
-    <string name="temp"> Temp</string>
+    <string name="timestamp">Timestamp:</string>
+    <string name="temp">Temp</string>
     <string name="temperature">Temperature: </string>
     <string name="xang">X Angle: </string>
     <string name="x">X</string>
