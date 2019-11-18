@@ -60,7 +60,7 @@
             android:id="@+id/textViewX"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/x"
+            android:hint="@string/x"
             android:gravity="end"
             android:textAlignment="gravity"
             android:layout_toEndOf="@id/xangText"
@@ -81,7 +81,7 @@
             android:id="@+id/textViewY"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/y"
+            android:hint="@string/y"
             android:gravity="end"
             android:textAlignment="gravity"
             android:layout_toEndOf="@id/yangText"
@@ -102,12 +102,33 @@
             android:id="@+id/textViewZ"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/z"
+            android:hint="@string/z"
             android:gravity="end"
             android:textAlignment="gravity"
             android:layout_toEndOf="@id/zangText"
             android:layout_toRightOf="@id/zangText"
             android:layout_below="@id/textViewY"/>
+
+        <!-- Garage State Block -->
+        <TextView
+            android:id="@+id/textGarageState"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/garage_state"
+            android:gravity="start"
+            android:textAlignment="gravity"
+            android:layout_below="@id/zangText"/>
+
+        <TextView
+            android:id="@+id/textViewGarageState"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/state"
+            android:gravity="end"
+            android:textAlignment="gravity"
+            android:layout_toEndOf="@id/textGarageState"
+            android:layout_toRightOf="@id/textGarageState"
+            android:layout_below="@id/textViewZ"/>
 
     </RelativeLayout>
 </ScrollView>

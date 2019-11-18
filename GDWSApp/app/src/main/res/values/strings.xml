@@ -10,4 +10,6 @@
     <string name="zang">Z Angle: </string>
     <string name="z">Z</string>
     <string name="time">Time: </string>
+    <string name="garage_state">Garage State:</string>
+    <string name="state">State</string>
 </resources>

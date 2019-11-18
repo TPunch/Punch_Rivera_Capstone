@@ -11,8 +11,13 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.*;
 import java.text.*;
+
+import static java.lang.Math.abs;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -21,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     TextView mXTextView;
     TextView mYTextView;
     TextView mZTextView;
+    TextView mGarageStateTextView;
 
     // Gets reference to the root of Firebase JSON tree
     DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
@@ -29,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     DatabaseReference mXRef = mRootRef.child("ADXL362").child("XAng");
     DatabaseReference mYRef = mRootRef.child("ADXL362").child("YAng");
     DatabaseReference mZRef = mRootRef.child("ADXL362").child("ZAng");
+    DatabaseReference mGarageStateRef = mRootRef.child("ADXL362").child("GarageState");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
         mXTextView = findViewById(R.id.textViewX);
         mYTextView = findViewById(R.id.textViewY);
         mZTextView = findViewById(R.id.textViewZ);
+        mGarageStateTextView = findViewById(R.id.textViewGarageState);
 
     }
 
@@ -68,7 +76,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 double tempVal = dataSnapshot.getValue(double.class);
-                mTempTextView.setText(String.valueOf(tempVal));
+                String temperature = tempVal + " \u2109";
+                mTempTextView.setText(temperature);
             }
 
             @Override
@@ -80,7 +89,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 double xVal = dataSnapshot.getValue(double.class);
-                mXTextView.setText(String.valueOf(xVal));
+                String X = xVal + " \u00B0";
+                mXTextView.setText(X);
             }
 
             @Override
@@ -92,7 +102,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 double yVal = dataSnapshot.getValue(double.class);
-                mYTextView.setText(String.valueOf(yVal));
+                double yAbs = Math.abs(yVal);
+                BigDecimal yRound = new BigDecimal(yVal);
+                if(yAbs > 9.999) yRound = yRound.round(new MathContext(4));
+                if(yAbs < 10.0 && yAbs > 0.0) yRound = yRound.round(new MathContext(3));
+                if(yAbs < 1.0 && yAbs > 0.0) yRound = yRound.round(new MathContext(2));
+                String Y = yRound + " \u00B0";
+                mYTextView.setText(Y);
             }
 
             @Override
@@ -104,7 +120,25 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 double zVal = dataSnapshot.getValue(double.class);
-                mZTextView.setText(String.valueOf(zVal));
+                BigDecimal zRound = new BigDecimal(zVal);
+                zRound = zRound.round(new MathContext(4));
+                String Z = zRound + " \u00B0";
+                mZTextView.setText(Z);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+        mGarageStateRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                double state = dataSnapshot.getValue(double.class);
+                String GarageState;
+                if(state == 0.0) GarageState = "Garage Door is Closed!";
+                else GarageState = "Garage Door is Open!";
+                mGarageStateTextView.setText(GarageState);
             }
 
             @Override
