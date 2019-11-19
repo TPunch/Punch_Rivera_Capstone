@@ -8,8 +8,8 @@ import android.widget.EditText;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
-
-    private EditText mMobileNumber;
+    public static final String EXTRA_MOBILE = "com.example.gdwsapp.EXTRA_MOBILE";
+    EditText mobileNumber;
     Button mButtonMobile;
 
     @Override
@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // Get UI elements
-        mMobileNumber = findViewById(R.id.textMobile);
+
         mButtonMobile = findViewById(R.id.mobileButton);
 
         mButtonMobile.setOnClickListener(new View.OnClickListener() {
@@ -34,7 +34,10 @@ public class MainActivity extends AppCompatActivity {
 
     // Method to view data display page
     protected void goToDataDisplay() {
-        Intent intent = new Intent(this, DataDisplay.class);
-        startActivity(intent);
+        mobileNumber = findViewById(R.id.textMobile);
+        String phoneNumber = mobileNumber.getText().toString();
+        Intent viewData = new Intent(this, DataDisplay.class);
+        viewData.putExtra(EXTRA_MOBILE, phoneNumber);
+        startActivity(viewData);
     }
 }

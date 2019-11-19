@@ -2,10 +2,18 @@ package com.example.gdwsapp;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.telephony.SmsManager;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
+// Firebase stuff
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -20,13 +28,16 @@ import java.util.Date;
 
 public class DataDisplay extends AppCompatActivity {
 
-    // Add text elements as properties
+    final int SEND_SMS_PERMISSION_REQUEST_CODE = 1;
+
+    // Add elements as properties
     TextView mTimeTextView;
     TextView mTempTextView;
     TextView mXTextView;
     TextView mYTextView;
     TextView mZTextView;
     TextView mGarageStateTextView;
+    Button mPreviousButton;
 
     // Gets reference to the root of Firebase JSON tree
     DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
@@ -40,6 +51,8 @@ public class DataDisplay extends AppCompatActivity {
 
     // Get garage state reference
     DatabaseReference mGarageStateRef = mRootRef.child("ADXL362").child("GarageState");
+
+    String mobileNumber;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +68,25 @@ public class DataDisplay extends AppCompatActivity {
         mYTextView = findViewById(R.id.textViewY);
         mZTextView = findViewById(R.id.textViewZ);
         mGarageStateTextView = findViewById(R.id.textViewGarageState);
+        mPreviousButton = findViewById(R.id.previousButton);
+
+        // Get mobile phone number from main activity
+        Intent getMobile = getIntent();
+        mobileNumber = getMobile.getStringExtra(MainActivity.EXTRA_MOBILE);
+
+        // Check to see if SMS permissions are set
+        if(!checkPermission(Manifest.permission.SEND_SMS)) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.SEND_SMS}, SEND_SMS_PERMISSION_REQUEST_CODE);
+        }
+
+        // Check to see if user wants to return to main (pressed button)
+        mPreviousButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goToMainActivity();
+            }
+        });
 
     }
 
@@ -71,10 +103,10 @@ public class DataDisplay extends AppCompatActivity {
                 // Also known as epoch time
                 Date date = new Date((long)timeVal);
                 // Create format for the date and time
-                DateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+                DateFormat human_readable = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
                 // Format the timestamp in human-readable time
-                String formatted = format.format(date);
-                mTimeTextView.setText(formatted); // Update display
+                String readable_time = human_readable.format(date);
+                mTimeTextView.setText(readable_time); // Update display
             }
 
             @Override
@@ -174,8 +206,14 @@ public class DataDisplay extends AppCompatActivity {
                 double state = dataSnapshot.getValue(double.class);
                 String GarageState;
                 // Display appropriate message depending on Garage State
-                if(state == 0.0) GarageState = "Garage Door is Closed!";
-                else GarageState = "Garage Door is Open!";
+                if(state == 0.0) GarageState = mobileNumber;
+                else {
+                    GarageState = "Garage Door is Open!";
+                    SmsManager smgr = SmsManager.getDefault();
+                    smgr.sendTextMessage(mobileNumber, null, GarageState,
+                            null, null);
+
+                }
                 mGarageStateTextView.setText(GarageState); // Update display
             }
 
@@ -184,5 +222,27 @@ public class DataDisplay extends AppCompatActivity {
 
             }
         });
+    }
+
+    // Add button to return to main page to re-enter mobile number
+    protected void goToMainActivity() {
+        Intent view_main = new Intent(this, MainActivity.class);
+        startActivity(view_main);
+    }
+
+    // Check SMS permissions
+    public boolean checkPermission(String permission) {
+        int check = ContextCompat.checkSelfPermission(this, permission);
+        return (check == PackageManager.PERMISSION_GRANTED);
+    }
+
+    // Start timer for notification
+    public void startTimer() {
+
+    }
+
+    // Stop timer for notification
+    public void stopTimer() {
+        
     }
 }

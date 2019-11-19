@@ -18,4 +18,5 @@
     <!-- Strings for Main Activity -->
     <string name="mobile">Enter Mobile #</string>
     <string name="add_num">Add Number</string>
+    <string name="previous">Previous Page</string>
 </resources>

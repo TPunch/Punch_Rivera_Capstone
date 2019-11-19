@@ -5,10 +5,25 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".MainActivity">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:orientation="vertical">
+        <Button
+            android:id="@+id/previousButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/previous"
+            android:textSize="10pt"
+            tools:ignore="InvalidId" />
+
+
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_gravity="top">
 
         <!-- Time Block -->
         <TextView
@@ -142,5 +157,9 @@
             android:layout_below="@id/textViewZ"
             android:textSize="12pt"/>
 
+
+
+
     </RelativeLayout>
+    </LinearLayout>
 </ScrollView>

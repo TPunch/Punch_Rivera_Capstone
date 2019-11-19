@@ -6,20 +6,23 @@
 
     <EditText
         android:id="@+id/textMobile"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
         android:gravity="center"
         android:textAlignment="gravity"
         android:hint="@string/mobile"
         android:inputType="phone"
         android:maxLength="11"
-        tools:ignore="InvalidId" />
+        tools:ignore="InvalidId"
+        android:textSize="10pt"/>
 
     <Button
         android:id="@+id/mobileButton"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/textMobile"
-        android:text="@string/add_num"/>
+        android:layout_below="@+id/textMobile"
+        android:text="@string/add_num"
+        android:textSize="10pt" />
 
 </RelativeLayout>
