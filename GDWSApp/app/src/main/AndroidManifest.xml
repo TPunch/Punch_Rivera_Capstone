@@ -2,10 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:dist="http://schemas.android.com/apk/distribution"
     package="com.example.gdwsapp">
-
     <!-- Add App internet permissions -->
-    <uses-permission android:name="android.permission.INTERNET" />
-    <!-- Add App SMS permissions-->
+    <uses-permission android:name="android.permission.INTERNET" /> <!-- Add App SMS permissions -->
     <uses-permission android:name="android.permission.SEND_SMS" />
 
     <dist:module dist:instant="true" />
@@ -17,6 +15,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".DataDisplay"></activity>
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
