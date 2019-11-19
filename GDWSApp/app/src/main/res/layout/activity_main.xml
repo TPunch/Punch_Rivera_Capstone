@@ -17,7 +17,8 @@
             android:layout_height="wrap_content"
             android:layout_alignStart="@id/timeText"
             android:layout_alignLeft="@id/timeText"
-            android:text="@string/timestamp" />
+            android:text="@string/timestamp"
+            android:textSize="12pt"/>
 
         <TextView
             android:id="@+id/textViewTime"
@@ -25,7 +26,8 @@
             android:layout_height="wrap_content"
             android:gravity="end"
             android:textAlignment="gravity"
-            android:hint="@string/time" />
+            android:hint="@string/time"
+            android:textSize="12pt"/>
 
         <!-- Temperature Block -->
         <TextView
@@ -35,7 +37,8 @@
             android:layout_alignStart="@id/tempText"
             android:layout_alignLeft="@id/tempText"
             android:text="@string/temperature"
-            android:layout_below="@id/timeText"/>
+            android:layout_below="@id/timeText"
+            android:textSize="12pt"/>
 
         <TextView
             android:id="@+id/textViewTemp"
@@ -44,7 +47,8 @@
             android:gravity="end"
             android:textAlignment="gravity"
             android:hint="@string/temp"
-            android:layout_below="@id/textViewTime"/>
+            android:layout_below="@id/textViewTime"
+            android:textSize="12pt"/>
 
         <!-- X Angle Block -->
         <TextView
@@ -54,7 +58,8 @@
             android:text="@string/xang"
             android:gravity="start"
             android:textAlignment="gravity"
-            android:layout_below="@id/textViewTemp"/>
+            android:layout_below="@id/textViewTemp"
+            android:textSize="12pt"/>
 
         <TextView
             android:id="@+id/textViewX"
@@ -65,7 +70,8 @@
             android:textAlignment="gravity"
             android:layout_toEndOf="@id/xangText"
             android:layout_toRightOf="@id/xangText"
-            android:layout_below="@id/tempText"/>
+            android:layout_below="@id/tempText"
+            android:textSize="12pt"/>
 
         <!-- Y Angle Block -->
         <TextView
@@ -75,7 +81,8 @@
             android:text="@string/yang"
             android:gravity="start"
             android:textAlignment="gravity"
-            android:layout_below="@id/xangText"/>
+            android:layout_below="@id/xangText"
+            android:textSize="12pt"/>
 
         <TextView
             android:id="@+id/textViewY"
@@ -86,7 +93,8 @@
             android:textAlignment="gravity"
             android:layout_toEndOf="@id/yangText"
             android:layout_toRightOf="@id/yangText"
-            android:layout_below="@id/textViewX"/>
+            android:layout_below="@id/textViewX"
+            android:textSize="12pt"/>
 
         <!-- Z Angle Block -->
         <TextView
@@ -96,7 +104,8 @@
             android:text="@string/zang"
             android:gravity="start"
             android:textAlignment="gravity"
-            android:layout_below="@id/yangText"/>
+            android:layout_below="@id/yangText"
+            android:textSize="12pt"/>
 
         <TextView
             android:id="@+id/textViewZ"
@@ -107,7 +116,8 @@
             android:textAlignment="gravity"
             android:layout_toEndOf="@id/zangText"
             android:layout_toRightOf="@id/zangText"
-            android:layout_below="@id/textViewY"/>
+            android:layout_below="@id/textViewY"
+            android:textSize="12pt"/>
 
         <!-- Garage State Block -->
         <TextView
@@ -117,7 +127,8 @@
             android:text="@string/garage_state"
             android:gravity="start"
             android:textAlignment="gravity"
-            android:layout_below="@id/zangText"/>
+            android:layout_below="@id/zangText"
+            android:textSize="12pt"/>
 
         <TextView
             android:id="@+id/textViewGarageState"
@@ -128,7 +139,8 @@
             android:textAlignment="gravity"
             android:layout_toEndOf="@id/textGarageState"
             android:layout_toRightOf="@id/textGarageState"
-            android:layout_below="@id/textViewZ"/>
+            android:layout_below="@id/textViewZ"
+            android:textSize="12pt"/>
 
     </RelativeLayout>
 </ScrollView>
