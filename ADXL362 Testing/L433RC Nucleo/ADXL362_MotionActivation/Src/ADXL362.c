@@ -127,7 +127,7 @@ void ADXL362_Init(void)
 
 	// Disable ADXL362 External Interrupts
 	HAL_NVIC_DisableIRQ(ADXL362_INT1_EXTI_IRQn);
-	HAL_NVIC_DisableIRQ(ADXL362_INT2_EXTI_IRQn);
+	//HAL_NVIC_DisableIRQ(ADXL362_INT2_EXTI_IRQn);
 
 	// Reset ADXL362 by writing 0x52(R in ASCII) to the Soft Reset Register
 	sprintf(msg, "\r\nInitiating ADXL362!\r\n");
@@ -156,10 +156,10 @@ void ADXL362_Init(void)
 	sprintf(msg, "\r\nINTMAP1 = 0x%X\r\n", reg);
 	HAL_UART_Transmit(&huart2, (uint8_t*)msg, strlen(msg), 0xFFFF);
 
-	ADXL362_WriteReg(INTMAP2,0x01);		// Map Data Ready Interrupt to INT2 pin
-	reg = ADXL362_ReadReg(INTMAP2);
-	sprintf(msg, "\r\nINTMAP2 = 0x%X\r\n", reg);
-	HAL_UART_Transmit(&huart2, (uint8_t*)msg, strlen(msg), 0xFFFF);
+	//ADXL362_WriteReg(INTMAP2,0x01);		// Map Data Ready Interrupt to INT2 pin
+	//reg = ADXL362_ReadReg(INTMAP2);
+	//sprintf(msg, "\r\nINTMAP2 = 0x%X\r\n", reg);
+	//HAL_UART_Transmit(&huart2, (uint8_t*)msg, strlen(msg), 0xFFFF);
 
 	// Configure ADXL362 Filter Control Register
 	ADXL362_WriteReg(FILTER_CTL,0x13);	// Set ADXL362 to 2g range, 25Hz
@@ -181,7 +181,7 @@ void ADXL362_Init(void)
 
 	// Begin continuous processing of ADXL362 data
 	HAL_NVIC_EnableIRQ(ADXL362_INT1_EXTI_IRQn);
-	HAL_NVIC_EnableIRQ(ADXL362_INT2_EXTI_IRQn);
+	//HAL_NVIC_EnableIRQ(ADXL362_INT2_EXTI_IRQn);
 
 }
 

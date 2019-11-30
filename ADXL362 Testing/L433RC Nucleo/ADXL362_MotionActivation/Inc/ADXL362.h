@@ -50,6 +50,7 @@
 #define Y_OFFSET		0.033
 #define Z_OFFSET		0.145
 #define TEMP_OFFSET		-17
+#define G_SCALER		1.2
 // ADXL362 USER Defined Constants
 #define USER_ACT_TIME		50		// 1 seconds
 #define USER_ACT_THRESH		50		// 350 mg

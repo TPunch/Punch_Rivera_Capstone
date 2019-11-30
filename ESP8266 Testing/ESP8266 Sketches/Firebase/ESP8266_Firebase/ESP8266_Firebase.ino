@@ -4,8 +4,8 @@
 #include <FirebaseESP8266.h>
 
 #ifndef STASSID
-#define STASSID "NotaVirus"
-#define STAPSK  "Buffalo1226"
+#define STASSID "AndroidAP"
+#define STAPSK  "foxh6118"
 #endif
 
 #ifndef FIREBASE_HOST
@@ -62,7 +62,7 @@ void loop(void) {
   int min = sec / 60;
   int hr = min / 60;
   int GarageState = 0;
-  double x = 0, y = 0, z = 0, t = 0;
+  double x = 0, y = 0, z = 0, t = 0, A = 0;
   boolean dataReady = false;
   String rxString, data;
 
@@ -132,6 +132,18 @@ void loop(void) {
           }
           Serial.println(GarageState);
           Serial.println();
+        }
+        if(rxString.indexOf("A") >=0) {
+          sign = rxString.charAt(1);
+          data = rxString.substring(2);
+          Serial.print("Garage Angle: ");
+          Serial.println(sign + data);
+          A = data.toDouble();
+          if (sign == '-'){
+            A *= -1;
+          }
+          Serial.println(t);
+          Serial.println();
           dataReady = true;
         }
         rxString = ""; //clears variable for new input
@@ -146,6 +158,7 @@ void loop(void) {
   Firebase.setDouble(firebaseData, "/ADXL362/ZAng", z);
   Firebase.setDouble(firebaseData, "/ADXL362/Temp", t);
   Firebase.setInt(firebaseData, "/ADXL362/GarageState", GarageState);
+  Firebase.setDouble(firebaseData, "/ADXL362/GarageTilt", A);
   Firebase.setTimestamp(firebaseData, "/ADXL362/Time");
 
 }

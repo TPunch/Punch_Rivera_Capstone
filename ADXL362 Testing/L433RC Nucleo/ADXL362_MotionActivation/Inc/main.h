@@ -58,14 +58,6 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define ADXL362_INT1_Pin GPIO_PIN_0
-#define ADXL362_INT1_GPIO_Port GPIOA
-#define ADXL362_INT1_EXTI_IRQn EXTI0_IRQn
-#define ADXL362_INT2_Pin GPIO_PIN_1
-#define ADXL362_INT2_GPIO_Port GPIOA
-#define ADXL362_INT2_EXTI_IRQn EXTI1_IRQn
-#define LED1_Pin GPIO_PIN_4
-#define LED1_GPIO_Port GPIOA
 #define ADXL362_SCK_Pin GPIO_PIN_13
 #define ADXL362_SCK_GPIO_Port GPIOB
 #define ADXL362_MISO_Pin GPIO_PIN_14
@@ -74,6 +66,11 @@ void Error_Handler(void);
 #define ADXL362_MOSI_GPIO_Port GPIOB
 #define ADXL362_CS_Pin GPIO_PIN_11
 #define ADXL362_CS_GPIO_Port GPIOA
+#define ADXL362_INT1_Pin GPIO_PIN_3
+#define ADXL362_INT1_GPIO_Port GPIOB
+#define ADXL362_INT1_EXTI_IRQn EXTI3_IRQn
+#define LED1_Pin GPIO_PIN_4
+#define LED1_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

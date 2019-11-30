@@ -33,7 +33,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define T_ANG 20
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -59,7 +59,7 @@ int16_t x12 = 0, y12 = 0, z12 = 0, temp12 = 0;
 volatile int16_t GarageState;
 volatile uint32_t drFlag, data_counter = 0, ADXL362_AFlag;
 double xyzt[400];
-double xAng, yAng, zAng, tempF;
+double xAng, yAng, zAng, tempF, xTilt, yTilt, zTilt;
 double xThresh, yThresh, zThresh;
 char message[200];
 /* USER CODE END PV */
@@ -80,7 +80,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-	if(GPIO_Pin == ADXL362_INT1_Pin)
+	if((GPIO_Pin == ADXL362_INT1_Pin) && (ADXL362_AFlag  == 0))
 	{
 		// Display MCU waking up
 		sprintf(message, "\r\nMCU has arisen from its slumber!\r\n");
@@ -94,10 +94,6 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 /**
   * @brief  The application entry point.
   * @retval int
-  */
-/**
-  * @brief System Clock Configuration
-  * @retval None
   */
 int main(void)
 {
@@ -148,7 +144,6 @@ int main(void)
   yThresh *= 180/M_PI;
   zThresh = atan2(sqrt(pow(xyzt[0], 2) + pow(xyzt[1], 2)), xyzt[2]);
   zThresh *= 180/M_PI;
-  zThresh -= 90;
 
   // Display & transmit current threshold angles
   sprintf(message, "\r\nxT:%+lf yT:%+lf zT:%+lf\r\n", xThresh, yThresh, zThresh);
@@ -181,13 +176,15 @@ int main(void)
 		  yAng *= 180/M_PI;
 		  zAng = atan2(sqrt(pow(xyzt[0], 2) + pow(xyzt[1], 2)), xyzt[2]);
 		  zAng *= 180/M_PI;
-		  zAng -= 90;
 
 		  // Convert degrees C to degrees F
 		  tempF = (xyzt[3] * (9.0/5.0)) + 32;
 
+		  xTilt = G_SCALER*((xThresh - 90) - (xAng - 90));
+		  yTilt = G_SCALER*((yThresh - 90) - (yAng - 90));
+		  zTilt = G_SCALER*((zThresh - 90) - (zAng - 90));
 		  // Determine garage door state by comparing threshold and current angles
-		  if((abs((int)(xThresh - xAng)) > 10) || (abs((int)(yThresh - yAng)) > 10) || (abs((int)(zThresh - zAng)) > 10)){
+		  if((xTilt > T_ANG) || (yTilt > T_ANG) || (zTilt > T_ANG)){
 			  HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET);
 			  GarageState = 1;
 		  } else{
@@ -196,7 +193,7 @@ int main(void)
 		  }
 
 		  // Display & transmit final garage door data before sleeping
-		  sprintf(message, " X%+lf Y%+lf Z%+lf T%+lf S%d \r\n", xAng, yAng, zAng, tempF, GarageState);
+		  sprintf(message, " X%+lf Y%+lf Z%+lf T%+lf S%d A%+lf \r\n", xAng, yAng, zAng, tempF, GarageState, zTilt);
 		  HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), 0xFFFF);
 		  HAL_UART_Transmit(&huart1, (uint8_t*)message, strlen(message), 0xFFFF);
 
@@ -218,25 +215,38 @@ int main(void)
 			  xyzt[data_counter+3] = (0.065 * (double)temp12) + TEMP_OFFSET;		// 0.065 degrees C = 1LSB
 
 			  // Process g's to angles x-axis angle(Rho), y-axis angle(Phi), and z-axis angle(Theta)
-			  xAng = atan2(xyzt[0], sqrt(pow(xyzt[1],2) + pow(xyzt[2], 2)));
+			  xAng = atan2(xyzt[data_counter], sqrt(pow(xyzt[data_counter+1],2) + pow(xyzt[data_counter+2], 2)));
 			  xAng *= 180/M_PI;
-			  yAng = atan2(xyzt[1], sqrt(pow(xyzt[0],2) + pow(xyzt[2], 2)));
+			  yAng = atan2(xyzt[data_counter+1], sqrt(pow(xyzt[data_counter],2) + pow(xyzt[data_counter+2], 2)));
 			  yAng *= 180/M_PI;
-			  zAng = atan2(sqrt(pow(xyzt[0], 2) + pow(xyzt[1], 2)), xyzt[2]);
+			  zAng = atan2(sqrt(pow(xyzt[data_counter], 2) + pow(xyzt[data_counter+1], 2)), xyzt[data_counter+2]);
 			  zAng *= 180/M_PI;
-			  zAng -= 90;
+			  //zAng -= 90;
 
 			  // Convert degrees C to degrees F
-			  tempF = (xyzt[3] * (9.0/5.0)) + 32;
+			  tempF = (xyzt[data_counter+3] * (9.0/5.0)) + 32;
+
+			  if((xTilt > T_ANG) || (yTilt > T_ANG) || (zTilt > T_ANG)){
+				  HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET);
+				  GarageState = 1;
+			  } else{
+				  HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_RESET);
+				  GarageState = 0;
+			  }
+
+			  xTilt = G_SCALER*((xThresh - 90) - (xAng - 90));
+			  yTilt = G_SCALER*((yThresh - 90) - (yAng - 90));
+			  zTilt = G_SCALER*((zThresh - 90) - (zAng - 90));
+
 
 			  // Display & transmit garage door data
-			  sprintf(message, " X%+lf Y%+lf Z%+lf T%+lf S%d \r\n", xAng, yAng, zAng, tempF, GarageState);
+			  sprintf(message, " X%+lf Y%+lf Z%+lf T%+lf S%d A%+lf \r\n", xAng, yAng, zAng, tempF, GarageState, zTilt);
 			  HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), 0xFFFF);
 			  HAL_UART_Transmit(&huart1, (uint8_t*)message, strlen(message), 0xFFFF);
 			  data_counter = 0;			// Reset data_counter
 		  }
 	  }
-	  HAL_Delay(10);
+	  HAL_Delay(2);
 
     /* USER CODE END WHILE */
 
@@ -245,6 +255,10 @@ int main(void)
   /* USER CODE END 3 */
 }
 
+/**
+  * @brief System Clock Configuration
+  * @retval None
+  */
 void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
@@ -447,32 +461,38 @@ static void MX_GPIO_Init(void)
   GPIO_InitTypeDef GPIO_InitStruct = {0};
 
   /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, LED1_Pin|ADXL362_CS_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(ADXL362_CS_GPIO_Port, ADXL362_CS_Pin, GPIO_PIN_SET);
 
-  /*Configure GPIO pins : ADXL362_INT1_Pin ADXL362_INT2_Pin */
-  GPIO_InitStruct.Pin = ADXL362_INT1_Pin|ADXL362_INT2_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : LED1_Pin ADXL362_CS_Pin */
-  GPIO_InitStruct.Pin = LED1_Pin|ADXL362_CS_Pin;
+  /*Configure GPIO pin : ADXL362_CS_Pin */
+  GPIO_InitStruct.Pin = ADXL362_CS_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+  HAL_GPIO_Init(ADXL362_CS_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : ADXL362_INT1_Pin */
+  GPIO_InitStruct.Pin = ADXL362_INT1_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(ADXL362_INT1_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : LED1_Pin */
+  GPIO_InitStruct.Pin = LED1_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  HAL_GPIO_Init(LED1_GPIO_Port, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
-  HAL_NVIC_SetPriority(EXTI0_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(EXTI0_IRQn);
-
-  HAL_NVIC_SetPriority(EXTI1_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(EXTI1_IRQn);
+  HAL_NVIC_SetPriority(EXTI3_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI3_IRQn);
 
 }
 
