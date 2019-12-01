@@ -33,7 +33,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define T_ANG 20
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -54,13 +54,9 @@ DMA_HandleTypeDef hdma_usart2_rx;
 DMA_HandleTypeDef hdma_usart2_tx;
 
 /* USER CODE BEGIN PV */
-int8_t x8 = 0, y8 = 0, z8 = 0;
-int16_t x12 = 0, y12 = 0, z12 = 0, temp12 = 0;
-volatile int16_t GarageState;
+int16_t GarageState;
 volatile uint32_t drFlag, data_counter = 0, ADXL362_AFlag;
-double xyzt[400];
-double xAng, yAng, zAng, tempF, xTilt, yTilt, zTilt;
-double xThresh, yThresh, zThresh;
+double tempF, ang[400], thresh[4], tilt[3];
 char message[200];
 /* USER CODE END PV */
 
@@ -126,29 +122,14 @@ int main(void)
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
-  // Initialize ADXL362
-  ADXL362_Init();
+	// Initialize ADXL362
+	ADXL362_Init();
 
-  ADXL362_GetXYZT(&x12, &y12, &z12, &temp12);		// Get X,Y,Z acceleration as ADC values for initial threshold values
+	ADXL362_GetAngT(thresh, 0);
 
-  // Process XYZT values to g's (acceleration due to gravity) 1mg = 1LSB
-  xyzt[0] = (0.001 * (double)x12) + X_OFFSET;				// Offsets are due to using a supply voltage of ~3.3VDC
-  xyzt[1] = (0.001 * (double)y12) + Y_OFFSET;				// Offsets were adjusted primarily from the datasheet
-  xyzt[2] = (0.001 * (double)z12) + Z_OFFSET;				// then manually after
-  xyzt[3] = (0.065 * (double)temp12) + TEMP_OFFSET;			// 0.065 degrees C = 1LSB
-
-  // Process g's to angles x-axis angle(Rho), y-axis angle(Phi), and z-axis angle(Theta)
-  xThresh = atan2(xyzt[0], sqrt(pow(xyzt[1],2) + pow(xyzt[2], 2)));
-  xThresh *= 180/M_PI;
-  yThresh = atan2(xyzt[1], sqrt(pow(xyzt[0],2) + pow(xyzt[2], 2)));
-  yThresh *= 180/M_PI;
-  zThresh = atan2(sqrt(pow(xyzt[0], 2) + pow(xyzt[1], 2)), xyzt[2]);
-  zThresh *= 180/M_PI;
-
-  // Display & transmit current threshold angles
-  sprintf(message, "\r\nxT:%+lf yT:%+lf zT:%+lf\r\n", xThresh, yThresh, zThresh);
-  HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), 0xFFFF);
-  HAL_UART_Transmit(&huart1, (uint8_t*)message, strlen(message), 0xFFFF);
+	// Display & transmit current threshold angles
+	sprintf(message, "\r\nxT:%+lf yT:%+lf zT:%+lf\r\n", thresh[0], thresh[1], thresh[2]);
+	HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), 0xFFFF);
 
   /* USER CODE END 2 */
 
@@ -158,95 +139,32 @@ int main(void)
   {
 	  // Check ADXL362 Awake interrupt to determine
 	  ADXL362_AFlag = HAL_GPIO_ReadPin(ADXL362_INT1_GPIO_Port, ADXL362_INT1_Pin);
-
 	  if (ADXL362_AFlag == 0){			// If the device is not moving
-
-		  ADXL362_GetXYZT(&x12, &y12, &z12, &temp12);		// Get X,Y,Z acceleration and temperature as ADC values
-
-		  // Process XYZT values to g's (acceleration due to gravity) 1mg = 1LSB
-		  xyzt[0] = (0.001 * (double)x12) + X_OFFSET;				// Offsets are due to using a supply voltage of ~3.3VDC
-		  xyzt[1] = (0.001 * (double)y12) + Y_OFFSET;				// Offsets were adjusted primarily from the datasheet
-		  xyzt[2] = (0.001 * (double)z12) + Z_OFFSET;				// then manually after
-		  xyzt[3] = (0.065 * (double)temp12) + TEMP_OFFSET;			// 0.065 degrees C = 1LSB
-
-		  // Process g's to angles x-axis angle(Rho), y-axis angle(Phi), and z-axis angle(Theta)
-		  xAng = atan2(xyzt[0], sqrt(pow(xyzt[1],2) + pow(xyzt[2], 2)));
-		  xAng *= 180/M_PI;
-		  yAng = atan2(xyzt[1], sqrt(pow(xyzt[0],2) + pow(xyzt[2], 2)));
-		  yAng *= 180/M_PI;
-		  zAng = atan2(sqrt(pow(xyzt[0], 2) + pow(xyzt[1], 2)), xyzt[2]);
-		  zAng *= 180/M_PI;
-
-		  // Convert degrees C to degrees F
-		  tempF = (xyzt[3] * (9.0/5.0)) + 32;
-
-		  xTilt = G_SCALER*((xThresh - 90) - (xAng - 90));
-		  yTilt = G_SCALER*((yThresh - 90) - (yAng - 90));
-		  zTilt = G_SCALER*((zThresh - 90) - (zAng - 90));
-		  // Determine garage door state by comparing threshold and current angles
-		  if((xTilt > T_ANG) || (yTilt > T_ANG) || (zTilt > T_ANG)){
-			  HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET);
-			  GarageState = 1;
-		  } else{
-			  HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_RESET);
-			  GarageState = 0;
-		  }
-
-		  // Display & transmit final garage door data before sleeping
-		  sprintf(message, " X%+lf Y%+lf Z%+lf T%+lf S%d A%+lf \r\n", xAng, yAng, zAng, tempF, GarageState, zTilt);
-		  HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), 0xFFFF);
-		  HAL_UART_Transmit(&huart1, (uint8_t*)message, strlen(message), 0xFFFF);
-
-		  // Display MCU going to sleep
-		  sprintf(message, "ADXL362 is sleeping. MCU is going night night!\r\n");
+		  sprintf(message, "\r\nMCU is going night night!\r\n");
 		  HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), 0xFFFF);
 		  HAL_Delay(200);
 		  HAL_SuspendTick();
 		  HAL_PWR_EnterSLEEPMode(PWR_LOWPOWERREGULATOR_ON, PWR_SLEEPENTRY_WFI);
 		  HAL_ResumeTick();
-	  } else{
-		  ADXL362_GetXYZT(&x12, &y12, &z12, &temp12);		// Get X,Y,Z acceleration and temperature as ADC values
-		  data_counter += 4;				// Increment data_counter
-		  if(data_counter == 396){			// Calculate every 100th dataset and display
-			  // Process XYZT values to g's (acceleration due to gravity) 1mg = 1LSB
-			  xyzt[data_counter] = (0.001 * (double)x12) + X_OFFSET;				// Offsets are due to using a supply voltage of ~3.3VDC
-			  xyzt[data_counter+1] = (0.001 * (double)y12) + Y_OFFSET;				// Offsets were adjusted primarily from the datasheet
-			  xyzt[data_counter+2] = (0.001 * (double)z12) + Z_OFFSET;				// then manually after
-			  xyzt[data_counter+3] = (0.065 * (double)temp12) + TEMP_OFFSET;		// 0.065 degrees C = 1LSB
-
-			  // Process g's to angles x-axis angle(Rho), y-axis angle(Phi), and z-axis angle(Theta)
-			  xAng = atan2(xyzt[data_counter], sqrt(pow(xyzt[data_counter+1],2) + pow(xyzt[data_counter+2], 2)));
-			  xAng *= 180/M_PI;
-			  yAng = atan2(xyzt[data_counter+1], sqrt(pow(xyzt[data_counter],2) + pow(xyzt[data_counter+2], 2)));
-			  yAng *= 180/M_PI;
-			  zAng = atan2(sqrt(pow(xyzt[data_counter], 2) + pow(xyzt[data_counter+1], 2)), xyzt[data_counter+2]);
-			  zAng *= 180/M_PI;
-			  //zAng -= 90;
-
-			  // Convert degrees C to degrees F
-			  tempF = (xyzt[data_counter+3] * (9.0/5.0)) + 32;
-
-			  if((xTilt > T_ANG) || (yTilt > T_ANG) || (zTilt > T_ANG)){
-				  HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET);
-				  GarageState = 1;
-			  } else{
-				  HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_RESET);
-				  GarageState = 0;
-			  }
-
-			  xTilt = G_SCALER*((xThresh - 90) - (xAng - 90));
-			  yTilt = G_SCALER*((yThresh - 90) - (yAng - 90));
-			  zTilt = G_SCALER*((zThresh - 90) - (zAng - 90));
-
-
-			  // Display & transmit garage door data
-			  sprintf(message, " X%+lf Y%+lf Z%+lf T%+lf S%d A%+lf \r\n", xAng, yAng, zAng, tempF, GarageState, zTilt);
-			  HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), 0xFFFF);
-			  HAL_UART_Transmit(&huart1, (uint8_t*)message, strlen(message), 0xFFFF);
-			  data_counter = 0;			// Reset data_counter
-		  }
+	  } else {
+		  HAL_Delay(2);
 	  }
-	  HAL_Delay(2);
+
+	  ADXL362_GetAngT(ang, data_counter);		// Get X,Y,Z acceleration and temperature as ADC values
+	  if(data_counter == 396){			// Calculate every 100th dataset and display
+
+		  // Convert degrees C to degrees F
+		  tempF = (ang[data_counter+3] * (9.0/5.0)) + 32;
+
+		  ADXL362_GetTiltState(ang, data_counter, thresh, tilt, &GarageState);
+
+		  // Display & transmit garage door data
+		  sprintf(message, " X%+lf Y%+lf Z%+lf T%+lf S%d A%+lf \r\n", ang[data_counter], ang[1 + data_counter], ang[2 + data_counter], tempF, GarageState, tilt[2]);
+		  HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), 0xFFFF);
+		  HAL_UART_Transmit(&huart1, (uint8_t*)message, strlen(message), 0xFFFF);
+		  data_counter = 0;			// Reset data_counter
+	  }
+	  data_counter += 4;				// Increment data_counter
 
     /* USER CODE END WHILE */
 

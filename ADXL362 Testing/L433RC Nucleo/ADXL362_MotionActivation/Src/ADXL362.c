@@ -93,7 +93,8 @@ void ADXL362_GetXYZ12(int16_t *x, int16_t *y, int16_t *z)
 	*z = ((int16_t)rxBuf[7] << 8) | (int16_t)rxBuf[6];
 }
 
-void ADXL362_GetXYZT(int16_t *x, int16_t *y, int16_t *z, int16_t *temp)
+
+void ADXL362_GetXYZT(int16_t *xyzt)
 {
 	uint8_t rxBuf[10] = {0,0,0,0,0,0,0,0,0,0};
 	uint8_t txBuf[10] = {0,0,0,0,0,0,0,0,0,0};
@@ -106,10 +107,50 @@ void ADXL362_GetXYZT(int16_t *x, int16_t *y, int16_t *z, int16_t *temp)
 	while(HAL_SPI_GetState(&hspi2) != HAL_SPI_STATE_READY);						// Wait until SPI communication is finished
 	HAL_GPIO_WritePin(ADXL362_CS_GPIO_Port, ADXL362_CS_Pin, GPIO_PIN_SET);		// Pull CS pin high to disable the slave
 
-	*x = ((int16_t)rxBuf[3] << 8) | (int16_t)rxBuf[2];
-	*y = ((int16_t)rxBuf[5] << 8) | (int16_t)rxBuf[4];
-	*z = ((int16_t)rxBuf[7] << 8) | (int16_t)rxBuf[6];
-	*temp = ((int16_t)rxBuf[9] << 8) | (int16_t)rxBuf[8];
+	xyzt[0] = ((int16_t)rxBuf[3] << 8) | (int16_t)rxBuf[2];
+	xyzt[1] = ((int16_t)rxBuf[5] << 8) | (int16_t)rxBuf[4];
+	xyzt[2] = ((int16_t)rxBuf[7] << 8) | (int16_t)rxBuf[6];
+	xyzt[3] = ((int16_t)rxBuf[9] << 8) | (int16_t)rxBuf[8];
+}
+
+void ADXL362_GetAngT(double *xyzt, uint32_t offset)
+{
+	int16_t itemp[4];
+	double dtemp[4];
+
+	// Get X,Y,Z acceleration as ADC values
+	ADXL362_GetXYZT(itemp);
+
+	// Process XYZT values to g's (acceleration due to gravity) 1mg = 1LSB
+	dtemp[0] = (G_LSB * (double)itemp[0]) + X_OFFSET;				// Offsets are due to using a supply voltage of ~3.3VDC
+	dtemp[1] = (G_LSB * (double)itemp[1]) + Y_OFFSET;				// Offsets were adjusted primarily from the datasheet
+	dtemp[2] = (G_LSB * (double)itemp[2]) + Z_OFFSET;				// then manually after
+	dtemp[3] = (T_LSB * (double)itemp[3]) + TEMP_OFFSET;			// 0.065 degrees C = 1LSB
+
+	// Process g's to angles x-axis angle(Rho), y-axis angle(Phi), and z-axis angle(Theta)
+	xyzt[offset] = atan2(dtemp[0], sqrt(pow(dtemp[1],2) + pow(dtemp[2], 2)));
+	xyzt[offset] *= 180/M_PI;
+	xyzt[1 + offset] = atan2(dtemp[1], sqrt(pow(dtemp[0],2) + pow(dtemp[2], 2)));
+	xyzt[1 + offset] *= 180/M_PI;
+	xyzt[2 + offset] = atan2(sqrt(pow(dtemp[0], 2) + pow(dtemp[1], 2)), dtemp[2]);
+	xyzt[2 + offset] *= 180/M_PI;
+	xyzt[3 + offset] = dtemp[3];
+}
+
+void ADXL362_GetTiltState(double *ang, int32_t offset, double *thresh, double *tilt, int16_t *GarageState)
+{
+	tilt[0] = G_SCALER*((thresh[0]) - (ang[offset]));
+	tilt[1] = G_SCALER*((thresh[1]) - (ang[1+offset]));
+	tilt[2] = G_SCALER*((thresh[2]) - (ang[2+offset]));
+
+	// Determine garage door state by comparing threshold and current angles
+	if((tilt[0] > T_ANG) || (tilt[1] > T_ANG) || (tilt[2] > T_ANG)){
+	  HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET);
+	  *GarageState = 1;
+	} else{
+	  HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_RESET);
+	  *GarageState = 0;
+	}
 }
 
 /**
