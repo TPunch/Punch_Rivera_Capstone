@@ -137,24 +137,22 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  // Check ADXL362 Awake interrupt to determine
+	  // Check ADXL362 Awake interrupt to determine if the device is moving
 	  ADXL362_AFlag = HAL_GPIO_ReadPin(ADXL362_INT1_GPIO_Port, ADXL362_INT1_Pin);
-	  if (ADXL362_AFlag == 0){			// If the device is not moving
+	  if (ADXL362_AFlag == 0){			// If the device is not moving then sleep
 		  sprintf(message, "\r\nMCU is going night night!\r\n");
 		  HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), 0xFFFF);
 		  HAL_Delay(200);
 		  HAL_SuspendTick();
 		  HAL_PWR_EnterSLEEPMode(PWR_LOWPOWERREGULATOR_ON, PWR_SLEEPENTRY_WFI);
 		  HAL_ResumeTick();
-	  } else {
+	  } else {		// Otherwise, process sensor data
 		  HAL_Delay(2);
 	  }
 
-	  ADXL362_GetAngT(ang, data_counter);		// Get X,Y,Z acceleration and temperature as ADC values
-	  if(data_counter == 396){			// Calculate every 100th dataset and display
-
-		  // Convert degrees C to degrees F
-		  tempF = (ang[data_counter+3] * (9.0/5.0)) + 32;
+	  // Get X,Y,Z angles and temperature
+	  ADXL362_GetAngT(ang, data_counter);
+	  if(data_counter == 396){		// Calculate tilt for every 100th dataset and transmit
 
 		  ADXL362_GetTiltState(ang, data_counter, thresh, tilt, &GarageState);
 
@@ -162,9 +160,9 @@ int main(void)
 		  sprintf(message, " X%+lf Y%+lf Z%+lf T%+lf S%d A%+lf \r\n", ang[data_counter], ang[1 + data_counter], ang[2 + data_counter], tempF, GarageState, tilt[2]);
 		  HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), 0xFFFF);
 		  HAL_UART_Transmit(&huart1, (uint8_t*)message, strlen(message), 0xFFFF);
-		  data_counter = 0;			// Reset data_counter
+		  data_counter = 0;		// Reset data_counter
 	  }
-	  data_counter += 4;				// Increment data_counter
+	  data_counter += 4;	// Increment data_counter
 
     /* USER CODE END WHILE */
 

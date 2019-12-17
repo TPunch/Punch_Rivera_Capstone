@@ -3,11 +3,13 @@
 #include <WiFiClient.h>
 #include <FirebaseESP8266.h>
 
+// WiFi Credentials
 #ifndef STASSID
 #define STASSID "AndroidAP"
 #define STAPSK  "foxh6118"
 #endif
 
+// Firebase credentials
 #ifndef FIREBASE_HOST
 #define FIREBASE_HOST "garage-door-warning-system.firebaseio.com" 
 #define FIREBASE_AUTH "gjUugc8Gz1UTi84SawRhHaVwfn5B33GzJqAdNj04" 
@@ -18,26 +20,25 @@ const char *password = STAPSK;
 
 FirebaseData firebaseData;
 
-const int led = 14;
-
 void setup(void) {
-  // Establish WiFi connection
-  pinMode(led, OUTPUT);
-  digitalWrite(led, 0);
+  
+  // Begin establishing WiFi connection
   Serial.begin(115200);
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   Serial.println("");
 
-  // Wait for connection
+  // Wait for WiFi to connect
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
+  
+  // Display MAC Address
   Serial.print("MAC: ");
   Serial.println(WiFi.macAddress());
 
-  digitalWrite(led, 1);
+  // Display IP Address
   Serial.println("");
   Serial.print("Connected to ");
   Serial.println(ssid);
@@ -48,32 +49,30 @@ void setup(void) {
   Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
   Firebase.reconnectWiFi(true);
   Serial.println("Connected to Firebase DB");
-
-  //Set database read timeout to 1 minute (max 15 minutes)
-  Firebase.setReadTimeout(firebaseData, 1000 * 60);
-  //tiny, small, medium, large and unlimited.
-  //Size and its write timeout e.g. tiny (1s), small (10s), medium (30s) and large (60s).
+  
+  // Set size and write timeout e.g. tiny (1s), small (10s), medium (30s) and large (60s).
   Firebase.setwriteSizeLimit(firebaseData, "tiny");
 }
 
+// Main loop
 void loop(void) {
-  char temp[400], sign, s;
-  int sec = millis() / 1000;
-  int min = sec / 60;
-  int hr = min / 60;
+  char sign, s;
   int GarageState = 0;
   double x = 0, y = 0, z = 0, t = 0, A = 0;
   boolean dataReady = false;
   String rxString, data;
 
+  // Process incoming serial data until a full set of processed data is received from the MCU
   while (dataReady == false)
     if (Serial.available()) {
-      char c = Serial.read();
+      char c = Serial.read(); // Read serial byte by byte
   
-      if (c == ' ') {
-        Serial.println(rxString); //prints string to serial port out
-       
-        if(rxString.indexOf("X") >=0) {
+      if (c == ' ') { // Processed data is space delimited with value identifier in the front
+        Serial.println(rxString); // Prints string with value to serial port out
+
+        // Only the identifiers for the X,Y,Z angles, tempearture, Garage Tilt, and Garage State are processed
+        // All other identifiers are ignored
+        if(rxString.indexOf("X") >=0) {   // Process and store X angle
           sign = rxString.charAt(1);
           data = rxString.substring(2);
           Serial.print("X: ");
@@ -85,7 +84,7 @@ void loop(void) {
           Serial.println(x);
           Serial.println();
         }
-        if(rxString.indexOf("Y") >=0) {
+        if(rxString.indexOf("Y") >=0) {   // Process and store Y angle
           sign = rxString.charAt(1);
           data = rxString.substring(2);
           Serial.print("Y: ");
@@ -97,7 +96,7 @@ void loop(void) {
           Serial.println(y);
           Serial.println();
         }
-        if(rxString.indexOf("Z") >=0) {
+        if(rxString.indexOf("Z") >=0) {   // Process and store Z angle
           sign = rxString.charAt(1);
           data = rxString.substring(2);
           Serial.print("Z: ");
@@ -109,7 +108,7 @@ void loop(void) {
           Serial.println(z);
           Serial.println();
         }
-        if(rxString.indexOf("T") >=0) {
+        if(rxString.indexOf("T") >=0) {   // Process and store tempearture
           sign = rxString.charAt(1);
           data = rxString.substring(2);
           Serial.print("Temp: ");
@@ -121,7 +120,7 @@ void loop(void) {
           Serial.println(t);
           Serial.println();
         }
-        if(rxString.indexOf("S") >=0) {
+        if(rxString.indexOf("S") >=0) {   // Process and store Garage State
           Serial.print("Garage State: ");
           if (rxString == "S1"){
             Serial.println("Open");
@@ -133,7 +132,7 @@ void loop(void) {
           Serial.println(GarageState);
           Serial.println();
         }
-        if(rxString.indexOf("A") >=0) {
+        if(rxString.indexOf("A") >=0) {   // Process and store Garage Tilt
           sign = rxString.charAt(1);
           data = rxString.substring(2);
           Serial.print("Garage Angle: ");
@@ -144,15 +143,17 @@ void loop(void) {
           }
           Serial.println(t);
           Serial.println();
-          dataReady = true;
+          dataReady = true;   // Set dataReady flag since this is the final value in the dataset
         }
-        rxString = ""; //clears variable for new input
+        rxString = ""; // Clears variable for new input
         data="";
       }
       else {
-        rxString += c; // Continue reading the string
+        rxString += c; // No "space" character so continue reading the string
       }
     }
+
+  // Transmit the X, Y, Z angles, temperature, Garage State, Garage Tilt, and Timestamp to Firebase database
   Firebase.setDouble(firebaseData, "/ADXL362/XAng", x);
   Firebase.setDouble(firebaseData, "/ADXL362/YAng", y);
   Firebase.setDouble(firebaseData, "/ADXL362/ZAng", z);

@@ -6,6 +6,12 @@ extern SPI_HandleTypeDef hspi2;
 extern UART_HandleTypeDef huart2;
 extern uint32_t ADXL362_AFlag;
 
+/**
+  * @brief ADXL362 Read Register Function
+  * @param address Address of register to read
+  * @param cmd Command byte to read to register
+  * @retval None
+  */
 uint8_t ADXL362_ReadReg (uint8_t address)
 {
 	uint8_t rxBuf[3], txBuf[3];
@@ -44,10 +50,9 @@ void ADXL362_WriteReg (uint8_t address, uint8_t cmd)
 
 /**
   * @brief ADXL362 Get XYZ 8bits Function
-  * @param address Address of register to write
-  * @param x Points to X-axis data buffer
-  * @param y Points to Y-axis data buffer
-  * @param z Points to Z-axis data buffer
+  * @param x Points to data buffer for X-axis
+  * @param y Points to data buffer for Y-axis
+  * @param z Points to data buffer for Z-axis
   * @retval None
   */
 void ADXL362_GetXYZ8(int8_t *x, int8_t *y, int8_t *z)
@@ -63,6 +68,7 @@ void ADXL362_GetXYZ8(int8_t *x, int8_t *y, int8_t *z)
 	while(HAL_SPI_GetState(&hspi2) != HAL_SPI_STATE_READY);						// Wait until SPI communication is finished
 	HAL_GPIO_WritePin(ADXL362_CS_GPIO_Port, ADXL362_CS_Pin, GPIO_PIN_SET);		// Pull CS pin high to disable the slave
 
+	// Store sensor data in buffers
 	*x = rxBuf[2];
 	*y = rxBuf[3];
 	*z = rxBuf[4];
@@ -70,9 +76,9 @@ void ADXL362_GetXYZ8(int8_t *x, int8_t *y, int8_t *z)
 
 /**
   * @brief ADXL362 Get XYZ 12bits Function
-  * @param x Points to X-axis data buffer
-  * @param y Points to Y-axis data buffer
-  * @param z Points to Z-axis data buffer
+  * @param x Points to data buffer for X-axis
+  * @param y Points to data buffer for Y-axis
+  * @param z Points to data buffer for Z-axis
   * @retval None
   */
 void ADXL362_GetXYZ12(int16_t *x, int16_t *y, int16_t *z)
@@ -88,13 +94,19 @@ void ADXL362_GetXYZ12(int16_t *x, int16_t *y, int16_t *z)
 	while(HAL_SPI_GetState(&hspi2) != HAL_SPI_STATE_READY);						// Wait until SPI communication is finished
 	HAL_GPIO_WritePin(ADXL362_CS_GPIO_Port, ADXL362_CS_Pin, GPIO_PIN_SET);		// Pull CS pin high to disable the slave
 
+	// Store sensor data in buffers
 	*x = ((int16_t)rxBuf[3] << 8) | (int16_t)rxBuf[2];
 	*y = ((int16_t)rxBuf[5] << 8) | (int16_t)rxBuf[4];
 	*z = ((int16_t)rxBuf[7] << 8) | (int16_t)rxBuf[6];
 }
 
-
-void ADXL362_GetXYZT(int16_t *xyzt)
+/**
+  * @brief ADXL362 Get XYZT 12bits Function
+  * @param xyzt Points to data buffer for XYZ-axes' forces and temperature
+  * @param offset Offset for xyzt buffer
+  * @retval None
+  */
+void ADXL362_GetXYZT(int16_t *xyzt, uint32_t offset)
 {
 	uint8_t rxBuf[10] = {0,0,0,0,0,0,0,0,0,0};
 	uint8_t txBuf[10] = {0,0,0,0,0,0,0,0,0,0};
@@ -107,19 +119,26 @@ void ADXL362_GetXYZT(int16_t *xyzt)
 	while(HAL_SPI_GetState(&hspi2) != HAL_SPI_STATE_READY);						// Wait until SPI communication is finished
 	HAL_GPIO_WritePin(ADXL362_CS_GPIO_Port, ADXL362_CS_Pin, GPIO_PIN_SET);		// Pull CS pin high to disable the slave
 
-	xyzt[0] = ((int16_t)rxBuf[3] << 8) | (int16_t)rxBuf[2];
-	xyzt[1] = ((int16_t)rxBuf[5] << 8) | (int16_t)rxBuf[4];
-	xyzt[2] = ((int16_t)rxBuf[7] << 8) | (int16_t)rxBuf[6];
-	xyzt[3] = ((int16_t)rxBuf[9] << 8) | (int16_t)rxBuf[8];
+	// Store sensor data in buffers
+	xyzt[offset] = ((int16_t)rxBuf[3] << 8) | (int16_t)rxBuf[2];
+	xyzt[offset + 1] = ((int16_t)rxBuf[5] << 8) | (int16_t)rxBuf[4];
+	xyzt[offset + 2] = ((int16_t)rxBuf[7] << 8) | (int16_t)rxBuf[6];
+	xyzt[offset + 3] = ((int16_t)rxBuf[9] << 8) | (int16_t)rxBuf[8];
 }
 
+/**
+  * @brief ADXL362 Get AngT Function
+  * @param xyzt Points to data buffer for XYZ angles and temperature
+  * @param offset Offset for xyzt buffer
+  * @retval None
+  */
 void ADXL362_GetAngT(double *xyzt, uint32_t offset)
 {
 	int16_t itemp[4];
 	double dtemp[4];
 
 	// Get X,Y,Z acceleration as ADC values
-	ADXL362_GetXYZT(itemp);
+	ADXL362_GetXYZT(itemp, 0);
 
 	// Process XYZT values to g's (acceleration due to gravity) 1mg = 1LSB
 	dtemp[0] = (G_LSB * (double)itemp[0]) + X_OFFSET;				// Offsets are due to using a supply voltage of ~3.3VDC
@@ -134,14 +153,26 @@ void ADXL362_GetAngT(double *xyzt, uint32_t offset)
 	xyzt[1 + offset] *= 180/M_PI;
 	xyzt[2 + offset] = atan2(sqrt(pow(dtemp[0], 2) + pow(dtemp[1], 2)), dtemp[2]);
 	xyzt[2 + offset] *= 180/M_PI;
-	xyzt[3 + offset] = dtemp[3];
+
+	// Convert degrees C to degrees F
+	xyzt[3 + offset] = (dtemp[3] * (9.0/5.0)) + 32;
 }
 
+/**
+  * @brief ADXL362 Get Tilt State Function
+  * @param ang Points to data buffer with XYZ angles and temperature
+  * @param offset Offset for ang buffer
+  * @param thresh Points to data buffer with XYZ threshold
+  * @param tilt Points to data buffer for garage tilt angles
+  * @param GarageState Points to data buffer for Garage State
+  * @retval None
+  */
 void ADXL362_GetTiltState(double *ang, int32_t offset, double *thresh, double *tilt, int16_t *GarageState)
 {
-	tilt[0] = G_SCALER*((thresh[0]) - (ang[offset]));
-	tilt[1] = G_SCALER*((thresh[1]) - (ang[1+offset]));
-	tilt[2] = G_SCALER*((thresh[2]) - (ang[2+offset]));
+	// Calculate tilt angles by using threshold angles as reference from
+	tilt[0] = -G_SCALER*((thresh[0]) - (ang[offset]));
+	tilt[1] = -G_SCALER*((thresh[1]) - (ang[1+offset]));
+	tilt[2] = -G_SCALER*((thresh[2]) - (ang[2+offset]));
 
 	// Determine garage door state by comparing threshold and current angles
 	if((tilt[0] > T_ANG) || (tilt[1] > T_ANG) || (tilt[2] > T_ANG)){
@@ -168,7 +199,6 @@ void ADXL362_Init(void)
 
 	// Disable ADXL362 External Interrupts
 	HAL_NVIC_DisableIRQ(ADXL362_INT1_EXTI_IRQn);
-	//HAL_NVIC_DisableIRQ(ADXL362_INT2_EXTI_IRQn);
 
 	// Reset ADXL362 by writing 0x52(R in ASCII) to the Soft Reset Register
 	sprintf(msg, "\r\nInitiating ADXL362!\r\n");
@@ -177,13 +207,15 @@ void ADXL362_Init(void)
 	HAL_Delay(1);
 
 	// Read ADXL362 registers
-	reg = ADXL362_ReadReg(DEVID_AD); 	// Read ID Register
+
+	// Read ID Register
+	reg = ADXL362_ReadReg(DEVID_AD);
 	sprintf(msg, "\r\nID0 = 0x%X\r\n", reg);
 	HAL_UART_Transmit(&huart2, (uint8_t*)msg, strlen(msg), 0xFFFF);
 
 	// Configure Activity and Inactivity Thresholds & Timers
-	ADXL362_ActivityInit(USER_ACT_THRESH, USER_ACT_TIME);		// 300 code Activity Threshold. ODR = 100Hz, so 10 results & time threshold = 1 seconds
-	ADXL362_InactivityInit(USER_INACT_THRESH, USER_INACT_TIME);	// 80 code Inactivity Threshold. ODR = 100Hz, so 30 results & time threshold = 2 seconds
+	ADXL362_ActivityInit(USER_ACT_THRESH, USER_ACT_TIME);		// 50 code Activity Threshold.
+	ADXL362_InactivityInit(USER_INACT_THRESH, USER_INACT_TIME);	// 50 code Inactivity Threshold.
 
 	// Configure ADXL362 Activity/Inactivity Control Register
 	ADXL362_WriteReg(ACT_INACT_CTL,0x3F);	// Set Referenced Activity and Inactivity, and Loop Mode
@@ -197,13 +229,8 @@ void ADXL362_Init(void)
 	sprintf(msg, "\r\nINTMAP1 = 0x%X\r\n", reg);
 	HAL_UART_Transmit(&huart2, (uint8_t*)msg, strlen(msg), 0xFFFF);
 
-	//ADXL362_WriteReg(INTMAP2,0x01);		// Map Data Ready Interrupt to INT2 pin
-	//reg = ADXL362_ReadReg(INTMAP2);
-	//sprintf(msg, "\r\nINTMAP2 = 0x%X\r\n", reg);
-	//HAL_UART_Transmit(&huart2, (uint8_t*)msg, strlen(msg), 0xFFFF);
-
 	// Configure ADXL362 Filter Control Register
-	ADXL362_WriteReg(FILTER_CTL,0x13);	// Set ADXL362 to 2g range, 25Hz
+	ADXL362_WriteReg(FILTER_CTL,0x13);	// Set ADXL362 to 2g range, 100Hz
 	reg = ADXL362_ReadReg(FILTER_CTL);
 	sprintf(msg, "\r\nFILTER_CTL = 0x%X\r\n", reg);
 	HAL_UART_Transmit(&huart2, (uint8_t*)msg, strlen(msg), 0xFFFF);
@@ -222,7 +249,6 @@ void ADXL362_Init(void)
 
 	// Begin continuous processing of ADXL362 data
 	HAL_NVIC_EnableIRQ(ADXL362_INT1_EXTI_IRQn);
-	//HAL_NVIC_EnableIRQ(ADXL362_INT2_EXTI_IRQn);
 
 }
 
