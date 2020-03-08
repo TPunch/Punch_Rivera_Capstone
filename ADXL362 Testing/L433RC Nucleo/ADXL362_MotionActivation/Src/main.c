@@ -54,10 +54,7 @@ DMA_HandleTypeDef hdma_usart2_rx;
 DMA_HandleTypeDef hdma_usart2_tx;
 
 /* USER CODE BEGIN PV */
-int16_t GarageState;
-volatile uint32_t drFlag, data_counter = 0, ADXL362_AFlag;
-double tempF, ang[400], thresh[4], tilt[3];
-char message[200];
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -68,22 +65,10 @@ static void MX_SPI2_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-{
-	if((GPIO_Pin == ADXL362_INT1_Pin) && (ADXL362_AFlag  == 0))
-	{
-		// Display MCU waking up
-		sprintf(message, "\r\nMCU has arisen from its slumber!\r\n");
-		HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), 0xFFFF);
-
-	}
-}
 
 /* USER CODE END 0 */
 
@@ -94,7 +79,11 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
+	float ang[400], thresh[4], tilt[3];
+	char message[200];
+	uint8_t GarageState;
+	uint16_t  data_counter = 0;
+	volatile uint32_t  ADXL362_AFlag = 0;
   /* USER CODE END 1 */
   
 
@@ -128,7 +117,7 @@ int main(void)
 	ADXL362_GetAngT(thresh, 0);
 
 	// Display & transmit current threshold angles
-	sprintf(message, "\r\nxT:%+lf yT:%+lf zT:%+lf\r\n", thresh[0], thresh[1], thresh[2]);
+	sprintf(message, "\r\nxT:%+lf yT:%+lf zT:%+lf Temp:%lf\r\n", thresh[0], thresh[1], thresh[2], thresh[3]);
 	HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), 0xFFFF);
 
   /* USER CODE END 2 */
@@ -142,27 +131,33 @@ int main(void)
 	  if (ADXL362_AFlag == 0){			// If the device is not moving then sleep
 		  sprintf(message, "\r\nMCU is going night night!\r\n");
 		  HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), 0xFFFF);
+		  ADXL362_GetAngT(ang, 0);
+		  ADXL362_GetTiltState(ang, 0, thresh, tilt, &GarageState);
+
+		  // Display & transmit final garage door data
+		  sprintf(message, " X%+lf Y%+lf Z%+lf T%+lf S%d A%+lf \r\n", ang[data_counter], ang[1 + data_counter], ang[2 + data_counter], ang[3 + data_counter], GarageState, tilt[1]);
+		  HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), 0xFFFF);
 		  HAL_Delay(200);
 		  HAL_SuspendTick();
 		  HAL_PWR_EnterSLEEPMode(PWR_LOWPOWERREGULATOR_ON, PWR_SLEEPENTRY_WFI);
 		  HAL_ResumeTick();
 	  } else {		// Otherwise, process sensor data
 		  HAL_Delay(2);
+		  ADXL362_GetAngT(ang, data_counter);	// Get X,Y,Z angles and temperature
+		  if(data_counter == 396){		// Calculate tilt for every 100th data set and transmit
+
+			  ADXL362_GetTiltState(ang, data_counter, thresh, tilt, &GarageState);
+
+			  // Display & transmit garage door data
+			  sprintf(message, " X%+lf Y%+lf Z%+lf T%+lf S%d A%+lf \r\n", ang[data_counter], ang[1 + data_counter], ang[2 + data_counter], ang[3 + data_counter], GarageState, tilt[1]);
+			  HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), 0xFFFF);
+			  HAL_UART_Transmit(&huart1, (uint8_t*)message, strlen(message), 0xFFFF);
+			  data_counter = 0;		// Reset data_counter
+		  }
+		  data_counter += 4;	// Increment data_counter
 	  }
 
-	  // Get X,Y,Z angles and temperature
-	  ADXL362_GetAngT(ang, data_counter);
-	  if(data_counter == 396){		// Calculate tilt for every 100th dataset and transmit
 
-		  ADXL362_GetTiltState(ang, data_counter, thresh, tilt, &GarageState);
-
-		  // Display & transmit garage door data
-		  sprintf(message, " X%+lf Y%+lf Z%+lf T%+lf S%d A%+lf \r\n", ang[data_counter], ang[1 + data_counter], ang[2 + data_counter], tempF, GarageState, tilt[2]);
-		  HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), 0xFFFF);
-		  HAL_UART_Transmit(&huart1, (uint8_t*)message, strlen(message), 0xFFFF);
-		  data_counter = 0;		// Reset data_counter
-	  }
-	  data_counter += 4;	// Increment data_counter
 
     /* USER CODE END WHILE */
 

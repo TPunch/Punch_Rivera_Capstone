@@ -4,7 +4,6 @@
 /* External variables --------------------------------------------------------*/
 extern SPI_HandleTypeDef hspi2;
 extern UART_HandleTypeDef huart2;
-extern uint32_t ADXL362_AFlag;
 
 /**
   * @brief ADXL362 Read Register Function
@@ -106,7 +105,7 @@ void ADXL362_GetXYZ12(int16_t *x, int16_t *y, int16_t *z)
   * @param offset Offset for xyzt buffer
   * @retval None
   */
-void ADXL362_GetXYZT(int16_t *xyzt, uint32_t offset)
+void ADXL362_GetXYZT(int16_t *xyzt, uint16_t offset)
 {
 	uint8_t rxBuf[10] = {0,0,0,0,0,0,0,0,0,0};
 	uint8_t txBuf[10] = {0,0,0,0,0,0,0,0,0,0};
@@ -132,30 +131,30 @@ void ADXL362_GetXYZT(int16_t *xyzt, uint32_t offset)
   * @param offset Offset for xyzt buffer
   * @retval None
   */
-void ADXL362_GetAngT(double *xyzt, uint32_t offset)
+void ADXL362_GetAngT(float *xyzt, uint16_t offset)
 {
 	int16_t itemp[4];
-	double dtemp[4];
+	float ftemp[4];
 
 	// Get X,Y,Z acceleration as ADC values
 	ADXL362_GetXYZT(itemp, 0);
 
 	// Process XYZT values to g's (acceleration due to gravity) 1mg = 1LSB
-	dtemp[0] = (G_LSB * (double)itemp[0]) + X_OFFSET;				// Offsets are due to using a supply voltage of ~3.3VDC
-	dtemp[1] = (G_LSB * (double)itemp[1]) + Y_OFFSET;				// Offsets were adjusted primarily from the datasheet
-	dtemp[2] = (G_LSB * (double)itemp[2]) + Z_OFFSET;				// then manually after
-	dtemp[3] = (T_LSB * (double)itemp[3]) + TEMP_OFFSET;			// 0.065 degrees C = 1LSB
+	ftemp[0] = (G_LSB * (float)itemp[0]);				// Offsets are due to using a supply voltage of ~3.3VDC
+	ftemp[1] = (G_LSB * (float)itemp[1]);				// Offsets were adjusted primarily from the datasheet
+	ftemp[2] = (G_LSB * (float)itemp[2]);				// then manually after
+	ftemp[3] = (T_LSB * (float)itemp[3]) + TEMP_OFFSET;			// 0.065 degrees C = 1LSB
 
 	// Process g's to angles x-axis angle(Rho), y-axis angle(Phi), and z-axis angle(Theta)
-	xyzt[offset] = atan2(dtemp[0], sqrt(pow(dtemp[1],2) + pow(dtemp[2], 2)));
-	xyzt[offset] *= 180/M_PI;
-	xyzt[1 + offset] = atan2(dtemp[1], sqrt(pow(dtemp[0],2) + pow(dtemp[2], 2)));
-	xyzt[1 + offset] *= 180/M_PI;
-	xyzt[2 + offset] = atan2(sqrt(pow(dtemp[0], 2) + pow(dtemp[1], 2)), dtemp[2]);
-	xyzt[2 + offset] *= 180/M_PI;
+	xyzt[offset] = atan2f(ftemp[0], sqrt(pow(ftemp[1],2) + pow(ftemp[2], 2)));
+	xyzt[offset] *= G_SCALER*180/M_PI;
+	xyzt[1 + offset] = atan2f(ftemp[1], sqrt(pow(ftemp[0],2) + pow(ftemp[2], 2)));
+	xyzt[1 + offset] *= G_SCALER*180/M_PI;
+	xyzt[2 + offset] = atan2f(sqrt(pow(ftemp[0], 2) + pow(ftemp[1], 2)), ftemp[2]);
+	xyzt[2 + offset] *= G_SCALER*180/M_PI;
 
 	// Convert degrees C to degrees F
-	xyzt[3 + offset] = (dtemp[3] * (9.0/5.0)) + 32;
+	xyzt[3 + offset] = (ftemp[3] * (9.0/5.0)) + 32;
 }
 
 /**
@@ -167,12 +166,12 @@ void ADXL362_GetAngT(double *xyzt, uint32_t offset)
   * @param GarageState Points to data buffer for Garage State
   * @retval None
   */
-void ADXL362_GetTiltState(double *ang, int32_t offset, double *thresh, double *tilt, int16_t *GarageState)
+void ADXL362_GetTiltState(float *ang, uint16_t offset, float *thresh, float *tilt, uint8_t *GarageState)
 {
 	// Calculate tilt angles by using threshold angles as reference from
-	tilt[0] = -G_SCALER*((thresh[0]) - (ang[offset]));
-	tilt[1] = -G_SCALER*((thresh[1]) - (ang[1+offset]));
-	tilt[2] = -G_SCALER*((thresh[2]) - (ang[2+offset]));
+	tilt[0] = ((thresh[0]) - (ang[offset]) + X_OFFSET);
+	tilt[1] = ((thresh[1]) - (ang[1+offset]) + Y_OFFSET);
+	tilt[2] = ((thresh[2]) - (ang[2+offset]) + Z_OFFSET);
 
 	// Determine garage door state by comparing threshold and current angles
 	if((tilt[0] > T_ANG) || (tilt[1] > T_ANG) || (tilt[2] > T_ANG)){
@@ -193,9 +192,6 @@ void ADXL362_Init(void)
 {
 	uint8_t reg = 0;	// Hold register value
 	char msg[50];		// Message to print
-
-	// Configure ADXL362_INT1
-	ADXL362_AFlag = 0;		// Reset AWAKE flag
 
 	// Disable ADXL362 External Interrupts
 	HAL_NVIC_DisableIRQ(ADXL362_INT1_EXTI_IRQn);

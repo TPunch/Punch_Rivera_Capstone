@@ -52,7 +52,7 @@
 #define Y_OFFSET		0.033
 #define Z_OFFSET		0.145
 #define TEMP_OFFSET		-17
-#define G_SCALER		1.01
+#define G_SCALER		1.04
 // ADXL362 USER Defined Constants
 #define USER_ACT_TIME		50		// 1 seconds
 #define USER_ACT_THRESH		50		// 350 mg
@@ -66,9 +66,9 @@ uint8_t ADXL362_ReadReg(uint8_t address);
 void ADXL362_WriteReg(uint8_t address, uint8_t cmd);
 void ADXL362_GetXYZ8(int8_t *x, int8_t *y, int8_t *z);
 void ADXL362_GetXYZ12(int16_t *x, int16_t *y, int16_t *z);
-void ADXL362_GetXYZT(int16_t *xyzt, uint32_t offset);
-void ADXL362_GetAngT(double *xyzt, uint32_t offset);
-void ADXL362_GetTiltState(double *ang, int32_t offset, double *thresh, double *tilt, int16_t *GarageState);
+void ADXL362_GetXYZT(int16_t *xyzt, uint16_t offset);
+void ADXL362_GetAngT(float *xyzt, uint16_t offset);
+void ADXL362_GetTiltState(float *ang, uint16_t offset, float *thresh, float *tilt, uint8_t *GarageState);
 void ADXL362_Init(void);
 void ADXL362_ActivityInit (uint16_t thresh, uint8_t timer);
 void ADXL362_InactivityInit (uint16_t thresh, uint16_t timer);
